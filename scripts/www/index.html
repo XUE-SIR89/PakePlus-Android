@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多元混合配比柜 · 完整版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f0f5fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 20px;
+        }
+        .card {
+            max-width: 1150px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            padding: 2rem 2.2rem 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 20, 40, 0.12);
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #0a2a44;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.2rem;
+            flex-wrap: wrap;
+        }
+        .sub {
+            color: #3d5f7d;
+            font-weight: 400;
+            font-size: 0.9rem;
+            background: #e6eef6;
+            padding: 4px 16px;
+            border-radius: 40px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem 2.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .param-group {
+            background: #f8fafc;
+            padding: 1.3rem 1.6rem;
+            border-radius: 24px;
+            border: 1px solid #e3ebf3;
+        }
+        .param-group h3 {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #163753;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .param-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1a405e;
+            margin: 0.8rem 0 0.25rem;
+        }
+        .param-group input,
+        .param-group select {
+            width: 100%;
+            padding: 0.55rem 0.8rem;
+            border: 1px solid #cbdae7;
+            border-radius: 16px;
+            background: white;
+            font-size: 0.95rem;
+            transition: 0.15s;
+        }
+        .param-group input:focus,
+        .param-group select:focus {
+            border-color: #2a7de0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 125, 224, 0.15);
+        }
+        .param-group input:disabled {
+            background: #eef2f7;
+            color: #6a7f94;
+        }
+        .inline-hint {
+            font-size: 0.75rem;
+            color: #4d718f;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        .gas-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #f0f5fb;
+            padding: 0.6rem 0.9rem;
+            border-radius: 20px;
+            margin: 0.6rem 0 0.3rem;
+            position: relative;
+        }
+        .gas-row select {
+            flex: 2;
+            min-width: 120px;
+        }
+        .gas-row select.error {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+        .gas-row span {
+            font-weight: 500;
+            color: #1c3b57;
+        }
+        .gas-property-tag {
+            font-size: 0.7rem;
+            padding: 0.1rem 0.7rem;
+            border-radius: 30px;
+            background: #e8eff6;
+            color: #1a4463;
+            margin-left: 6px;
+            display: inline-block;
+        }
+        .gas-property-tag.air {
+            background: #d4e4fc;
+            color: #004080;
+        }
+        .gas-property-tag.h2 {
+            background: #fce4d4;
+            color: #8a4a1a;
+        }
+        .gas-property-tag.inert {
+            background: #e6eef6;
+            color: #3a5a7a;
+        }
+        .result-area {
+            background: #eaf2fa;
+            border-radius: 24px;
+            padding: 1.6rem 2rem;
+            margin: 1.8rem 0 1rem;
+            border-left: 6px solid #1f6bc0;
+        }
+        .result-area.disabled {
+            opacity: 0.5;
+            border-left-color: #999;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem 1.8rem;
+            margin-top: 0.3rem;
+        }
+        .result-item {
+            background: white;
+            border-radius: 20px;
+            padding: 0.9rem 1.2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #dce8f2;
+        }
+        .result-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #3a6385;
+            font-weight: 600;
+        }
+        .result-item .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #07273f;
+            margin-top: 2px;
+        }
+        .result-item .value .unit {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #4a6d8b;
+            margin-left: 4px;
+        }
+        .result-item .sub-info {
+            font-size: 0.75rem;
+            color: #3a688b;
+            margin-top: 2px;
+        }
+        .btn {
+            background: #1a5fb0;
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 0.9rem 2.6rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 8px 18px -6px rgba(26, 85, 160, 0.3);
+            letter-spacing: 0.3px;
+            width: fit-content;
+            margin: 0.2rem auto 0.6rem;
+        }
+        .btn:hover {
+            background: #104a91;
+            transform: scale(1.01);
+        }
+        .btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .btn:disabled:hover {
+            background: #999;
+            transform: none;
+        }
+        .flex-center {
+            display: flex;
+            justify-content: center;
+        }
+        hr {
+            border: none;
+            border-top: 2px dashed #cbddee;
+            margin: 1.2rem 0 0.8rem;
+        }
+        .example-badge {
+            background: #dce8f3;
+            border-radius: 30px;
+            padding: 0.2rem 1.2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #163a57;
+            display: inline-block;
+            margin-left: 12px;
+        }
+        .highlight-box {
+            background: #fff9e6;
+            border: 1px solid #f0dba8;
+            border-radius: 16px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.85rem;
+            color: #6b551a;
+            margin: 0.6rem 0 0.2rem;
+        }
+        .highlight-box.error {
+            background: #ffebee;
+            border-color: #ef9a9a;
+            color: #b71c1c;
+        }
+        .pressure-section {
+            background: #f2f8ff;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            margin: 0.2rem 0 0.6rem;
+        }
+        .pressure-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.5rem;
+            align-items: center;
+        }
+        .pressure-row .label-main {
+            font-weight: 600;
+            color: #1a4568;
+        }
+        .pressure-mode {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .pressure-mode label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #1a405e;
+            cursor: pointer;
+        }
+        .pressure-mode input[type="radio"] {
+            width: auto;
+            margin-right: 4px;
+        }
+        .pressure-input-area {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pressure-input-area input {
+            width: 100px;
+            padding: 0.4rem 0.6rem;
+            border-radius: 30px;
+            border: 1px solid #c5d7e8;
+            background: #fafcff;
+            font-size: 0.95rem;
+        }
+        .pressure-input-area input:disabled {
+            background: #eef2f7;
+            color: #6a7f94;
+        }
+        .pressure-hint {
+            font-size: 0.75rem;
+            color: #4a6f8e;
+            margin-top: 4px;
+            padding-left: 8px;
+        }
+        .tag {
+            background: #e4edf7;
+            padding: 0.1rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: #31658b;
+        }
+        .pressure-detail-table {
+            margin-top: 6px;
+            font-size: 0.78rem;
+            color: #2a5a7a;
+            background: #e8f0f8;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        .target-badge {
+            display: inline-block;
+            padding: 0.15rem 0.9rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-left: 8px;
+        }
+        .target-badge.o2 {
+            background: #d4e4fc;
+            color: #004080;
+        }
+        .target-badge.h2 {
+            background: #fce4d4;
+            color: #8a4a1a;
+        }
+        .target-badge.vol {
+            background: #e6eef6;
+            color: #1a4463;
+        }
+        .target-badge.inert {
+            background: #e8e8e8;
+            color: #555;
+        }
+        .target-badge.error {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+        .verify-box {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 16px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+            color: #1e5a2a;
+            margin-top: 0.6rem;
+        }
+        .verify-box.warning {
+            background: #ffebee;
+            border-color: #ef9a9a;
+            color: #b71c1c;
+        }
+        .verify-box.info {
+            background: #e3f2fd;
+            border-color: #90caf9;
+            color: #0d47a1;
+        }
+        .verify-box.inert {
+            background: #f5f5f5;
+            border-color: #ccc;
+            color: #555;
+        }
+        .verify-box.error {
+            background: #ffebee;
+            border-color: #ef9a9a;
+            color: #b71c1c;
+        }
+        .table-compare {
+            margin-top: 0.8rem;
+            font-size: 0.82rem;
+            background: #eef4fa;
+            border-radius: 16px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #d0dde8;
+        }
+        .table-compare table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-compare td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #dce4ec;
+        }
+        .table-compare tr:last-child td {
+            border-bottom: none;
+        }
+        .table-compare .label-cell {
+            font-weight: 500;
+            color: #1a405e;
+        }
+        .table-compare .value-cell {
+            text-align: right;
+            font-weight: 600;
+            color: #07273f;
+        }
+        .target-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0a2a44;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .scenario-tag {
+            display: inline-block;
+            padding: 0.1rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: #e6eef6;
+            color: #1a4463;
+            margin-left: 8px;
+        }
+        .scenario-tag.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .scenario-tag.error {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.3rem 0.8rem;
+            background: #ffebee;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        @media (max-width: 700px) {
+            .card {
+                padding: 1.5rem;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .pressure-section {
+                padding: 0.8rem 1rem;
+                border-radius: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+            <h1>
+                ⚙️ 配比柜计算
+                <span class="sub">完整场景覆盖</span>
+            </h1>
+            <span class="example-badge">空气含氧 20.95%</span>
+        </div>
+
+        <div class="grid-2">
+            <div class="param-group">
+                <h3>📦 总输出条件</h3>
+                <label>总流量 (Nm³/h) <span style="font-weight:400; color:#4d718f; font-size:0.8rem;">(按需设定)</span></label>
+                <input type="number" id="totalFlow" value="15" step="0.1" min="0.1">
+
+                <label>出口压力 (MPa) <span style="font-weight:400; color:#4d718f; font-size:0.8rem;">(按需设定)</span></label>
+                <input type="number" id="outPressure" value="0.15" step="0.01" min="0.01">
+
+                <div class="target-label">
+                    <span>目标含量</span>
+                    <span id="targetBadge" class="target-badge o2">氧含量</span>
+                    <span id="scenarioTag" class="scenario-tag active">含氧配比</span>
+                </div>
+                <input type="number" id="targetConc" value="7" step="0.1" min="0" max="100">
+                <div class="inline-hint" id="targetHint">气质A为空气 → 目标为氧含量</div>
+            </div>
+
+            <div class="param-group">
+                <h3>🧪 气体组分 <span style="font-weight:400; font-size:0.8rem; color:#dc3545;" id="sameGasWarning"></span></h3>
+                <div class="gas-row">
+                    <span style="min-width:40px;">A</span>
+                    <select id="gasA">
+                        <option value="air" selected>空气 ⚡含氧</option>
+                        <option value="nitrogen">氮气 ●惰性</option>
+                        <option value="hydrogen">氢气 🔥可燃</option>
+                        <option value="argon">氩气 ●惰性</option>
+                        <option value="methane">甲烷 🔥可燃</option>
+                        <option value="carbonDioxide">二氧化碳 ●惰性</option>
+                    </select>
+                    <span style="font-size:0.8rem; color:#2a5e7e;">(目标组分)</span>
+                    <span id="gasABadge" class="gas-property-tag air">⚡含氧</span>
+                </div>
+                <div class="gas-row">
+                    <span style="min-width:40px;">B</span>
+                    <select id="gasB">
+                        <option value="air">空气 ⚡含氧</option>
+                        <option value="nitrogen" selected>氮气 ●惰性</option>
+                        <option value="hydrogen">氢气 🔥可燃</option>
+                        <option value="argon">氩气 ●惰性</option>
+                        <option value="methane">甲烷 🔥可燃</option>
+                        <option value="carbonDioxide">二氧化碳 ●惰性</option>
+                    </select>
+                    <span style="font-size:0.8rem; color:#2a5e7e;">(稀释/平衡)</span>
+                    <span id="gasBBadge" class="gas-property-tag inert">●惰性</span>
+                </div>
+                <div id="gasNoteContainer">
+                    <div class="highlight-box" id="gasNote">
+                        💡 空气+氮气混合 → 目标为氧含量 (空气中含氧20.95%)
+                    </div>
+                </div>
+                <div class="verify-box" id="verifyBox">
+                    ✅ 计算验证：目标氧含量 7% → 空气占比 = 7% ÷ 20.95% = 33.41%
+                </div>
+                <div class="table-compare" id="compareTable">
+                    <table>
+                        <tr><td class="label-cell">📐 配比公式</td><td class="value-cell">空气流量 = 总流量 × (目标氧% ÷ 20.95%)</td></tr>
+                        <tr><td class="label-cell">🔢 当前计算</td><td class="value-cell">空气 = 15 × (7 ÷ 20.95) = 5.01 Nm³/h</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 压力要求设置 -->
+        <div class="pressure-section">
+            <div class="pressure-row">
+                <span class="label-main">🔧 前端压力配置</span>
+                <div class="pressure-mode">
+                    <label><input type="radio" name="pressureMode" value="auto" checked> 自动估算</label>
+                    <label><input type="radio" name="pressureMode" value="manual"> 手动设定</label>
+                </div>
+            </div>
+            <div class="pressure-row" style="margin-top:4px;">
+                <div class="pressure-input-area">
+                    <span style="color:#25557a; font-weight:500;">系统压损:</span>
+                    <input type="number" id="systemPressureDrop" value="0.08" step="0.005" min="0.01">
+                    <span style="color:#25557a;">MPa</span>
+                    <span class="tag">可自定义</span>
+                </div>
+                <div class="pressure-input-area">
+                    <span style="color:#25557a; font-weight:500;">前端压力:</span>
+                    <input type="number" id="frontPressure" value="0.23" step="0.01" min="0.01">
+                    <span style="color:#25557a;">MPa</span>
+                </div>
+            </div>
+            <div class="pressure-hint" id="pressureHint">自动模式：前端压力 = 出口压力 + 系统压损</div>
+            <div class="pressure-detail-table" id="pressureDetailTable">
+                💡 压损组成：流量计 0.02~0.05 + 管道/阀门 0.01~0.03 + 混合器 0.01~0.03 + 裕量 0.01~0.02 MPa
+            </div>
+        </div>
+
+        <div class="flex-center">
+            <button class="btn" id="calcBtn">⟳ 计算配比 & 压力</button>
+        </div>
+
+        <!-- 结果展示区 -->
+        <div class="result-area" id="resultArea">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 0.8rem;">
+                <span style="font-weight:700; color:#0d3450; font-size:1.1rem;">📊 质量流量计设置 (L/min)</span>
+                <span style="font-size:0.8rem; background:#d2e2f2; padding:0.2rem 1rem; border-radius:40px;">标准状态 (0°C, 101.325kPa)</span>
+            </div>
+            <div class="result-grid" id="resultGrid">
+                <div class="result-item">
+                    <div class="label">🧪 气质A · 空气</div>
+                    <div class="value">83.53 <span class="unit">L/min</span></div>
+                    <div class="sub-info">占比 33.4%</div>
+                </div>
+                <div class="result-item">
+                    <div class="label">🧪 气质B · 氮气</div>
+                    <div class="value">166.47 <span class="unit">L/min</span></div>
+                    <div class="sub-info">占比 66.6%</div>
+                </div>
+                <div class="result-item">
+                    <div class="label">📈 总流量 (标况)</div>
+                    <div class="value">250.00 <span class="unit">L/min</span></div>
+                    <div class="sub-info">15.00 Nm³/h</div>
+                </div>
+            </div>
+            <div style="margin-top: 1.2rem; display: flex; flex-wrap: wrap; gap: 0.8rem 1.8rem; background: #e1eefa; padding: 0.4rem 1.4rem; border-radius: 30px;">
+                <span style="font-weight:600;">💡 调压阀设定:</span>
+                <span id="pressureDisplay" style="font-weight:700; color:#004080;">0.230 MPa</span>
+                <span style="font-weight:400; color:#1a4a6b; font-size:0.85rem;" id="pressureDetail">出口 0.150 MPa · 压差 0.080 MPa</span>
+            </div>
+            <div style="margin-top: 0.8rem; font-size:0.9rem; color:#1a4a6b; background:#d7e6f5; padding:0.2rem 1.2rem; border-radius:40px; display:inline-block;">
+                <span id="flowSummary">总流量 15.00 Nm³/h → 氧含量 7.0% (空气贡献) · 出口 0.150 MPa · 前端 0.230 MPa</span>
+            </div>
+        </div>
+
+        <hr>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; font-size:0.85rem; color:#2b5075; justify-content: space-between;">
+            <span>📌 空气+氮气: 15 Nm³/h, 7% O₂, 0.15MPa</span>
+            <span>📌 空气+氩气: 15 Nm³/h, 7% O₂, 0.15MPa</span>
+            <span>📌 氢气+氮气: 20 Nm³/h, 10% H₂, 0.3MPa</span>
+            <span>📌 甲烷+氮气: 20 Nm³/h, 15% CH₄, 0.25MPa</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const O2_IN_AIR = 0.2095;
+            const gasMap = {
+                air: { name: '空气', molarMass: 28.97, isAir: true, isH2: false, property: '⚡含氧', badge: 'air' },
+                nitrogen: { name: '氮气', molarMass: 28.013, isAir: false, isH2: false, property: '●惰性', badge: 'inert' },
+                hydrogen: { name: '氢气', molarMass: 2.016, isAir: false, isH2: true, property: '🔥可燃', badge: 'h2' },
+                argon: { name: '氩气', molarMass: 39.948, isAir: false, isH2: false, property: '●惰性', badge: 'inert' },
+                methane: { name: '甲烷', molarMass: 16.043, isAir: false, isH2: false, property: '🔥可燃', badge: 'h2' },
+                carbonDioxide: { name: '二氧化碳', molarMass: 44.01, isAir: false, isH2: false, property: '●惰性', badge: 'inert' }
+            };
+            const NM3_TO_LMIN = 1000 / 60;
+
+            // DOM
+            const totalFlowEl = document.getElementById('totalFlow');
+            const outPressureEl = document.getElementById('outPressure');
+            const targetConcEl = document.getElementById('targetConc');
+            const targetBadge = document.getElementById('targetBadge');
+            const scenarioTag = document.getElementById('scenarioTag');
+            const gasAEl = document.getElementById('gasA');
+            const gasBEl = document.getElementById('gasB');
+            const gasABadge = document.getElementById('gasABadge');
+            const gasBBadge = document.getElementById('gasBBadge');
+            const gasNote = document.getElementById('gasNote');
+            const gasNoteContainer = document.getElementById('gasNoteContainer');
+            const targetHint = document.getElementById('targetHint');
+            const verifyBox = document.getElementById('verifyBox');
+            const compareTable = document.getElementById('compareTable');
+            const resultArea = document.getElementById('resultArea');
+            const calcBtn = document.getElementById('calcBtn');
+            const sameGasWarning = document.getElementById('sameGasWarning');
+            const frontPressureEl = document.getElementById('frontPressure');
+            const systemPressureDropEl = document.getElementById('systemPressureDrop');
+            const pressureModeRadios = document.querySelectorAll('input[name="pressureMode"]');
+            const pressureHintEl = document.getElementById('pressureHint');
+
+            let isSameGas = false;
+
+            // ===== 判断场景类型 =====
+            function getScenario(aKey, bKey) {
+                const a = gasMap[aKey];
+                const b = gasMap[bKey];
+
+                if (aKey === bKey) {
+                    return {
+                        type: 'ERROR',
+                        label: '❌ 错误',
+                        badge: 'error',
+                        icon: '⚠️',
+                        tag: '无效配比',
+                        tagClass: 'error',
+                        formula: '—',
+                        note: '⚠️ 气质A和B不能为同一种气体！请选择不同的气体组分。'
+                    };
+                }
+
+                // 场景1: 气质A是空气 → 氧含量配比
+                if (a.isAir) {
+                    return {
+                        type: 'O2',
+                        label: '氧含量',
+                        badge: 'o2',
+                        icon: 'O₂',
+                        tag: '含氧配比',
+                        tagClass: 'active',
+                        formula: `空气流量 = 总流量 × (目标氧% ÷ ${(O2_IN_AIR*100).toFixed(2)}%)`,
+                        note: `💡 ${a.name}+${b.name}混合 → 目标为氧含量 (空气中含氧${(O2_IN_AIR*100).toFixed(2)}%)`
+                    };
+                }
+
+                // 场景2: 气质A是氢气 → 氢含量配比
+                if (a.isH2) {
+                    return {
+                        type: 'H2',
+                        label: '氢含量',
+                        badge: 'h2',
+                        icon: 'H₂',
+                        tag: '含氢配比',
+                        tagClass: 'active',
+                        formula: `氢气流量 = 总流量 × (目标氢% ÷ 100)`,
+                        note: `💡 ${a.name}+${b.name}混合 → 目标为氢含量 (体积分数)`
+                    };
+                }
+
+                // 场景3: 气质B是空气 → 目标为A的体积分数，空气带入氧
+                if (b.isAir) {
+                    return {
+                        type: 'VOL_AIR',
+                        label: `${a.name}体积分数`,
+                        badge: 'vol',
+                        icon: a.name,
+                        tag: '惰性+空气',
+                        tagClass: '',
+                        formula: `${a.name}流量 = 总流量 × (目标% ÷ 100)`,
+                        note: `💡 ${a.name}+${b.name}混合 → 目标为${a.name}浓度，空气会带入氧气`
+                    };
+                }
+
+                // 场景4: 两者都是惰性气体 → 简单体积分数混合
+                return {
+                    type: 'INERT',
+                    label: `${a.name}体积分数`,
+                    badge: 'inert',
+                    icon: a.name,
+                    tag: '惰性混合',
+                    tagClass: '',
+                    formula: `${a.name}流量 = 总流量 × (目标% ÷ 100)`,
+                    note: `💡 ${a.name}+${b.name}混合 → 不含氧/氢，目标为${a.name}体积分数 (直接配比)`
+                };
+            }
+
+            // ===== 检查是否同一种气体 =====
+            function checkSameGas() {
+                const aKey = gasAEl.value;
+                const bKey = gasBEl.value;
+                isSameGas = (aKey === bKey);
+
+                if (isSameGas) {
+                    gasAEl.classList.add('error');
+                    gasBEl.classList.add('error');
+                    sameGasWarning.textContent = '⚠️ A和B不能相同！';
+                    sameGasWarning.style.color = '#dc3545';
+                } else {
+                    gasAEl.classList.remove('error');
+                    gasBEl.classList.remove('error');
+                    sameGasWarning.textContent = '';
+                }
+
+                return isSameGas;
+            }
+
+            // ===== 更新UI =====
+            function updateUI() {
+                const aKey = gasAEl.value;
+                const bKey = gasBEl.value;
+                const a = gasMap[aKey];
+                const b = gasMap[bKey];
+                const scenario = getScenario(aKey, bKey);
+                const targetVal = parseFloat(targetConcEl.value) || 0;
+                const totalFlow = parseFloat(totalFlowEl.value) || 0;
+
+                // 更新气体标签
+                gasABadge.textContent = a.property;
+                gasABadge.className = `gas-property-tag ${a.badge}`;
+                gasBBadge.textContent = b.property;
+                gasBBadge.className = `gas-property-tag ${b.badge}`;
+
+                // 检查是否同一种气体
+                const same = checkSameGas();
+
+                // 更新目标标签
+                targetBadge.textContent = scenario.label;
+                targetBadge.className = `target-badge ${scenario.badge}`;
+
+                // 更新场景标签
+                scenarioTag.textContent = scenario.tag;
+                scenarioTag.className = `scenario-tag ${scenario.tagClass}`;
+
+                // 如果同一种气体，显示错误状态
+                if (same) {
+                    gasNoteContainer.innerHTML = `
+                            <div class="highlight-box error">
+                                ⚠️ 气质A和B不能为同一种气体！请选择不同的气体组分。
+                            </div>
+                        `;
+                    targetHint.textContent = '⚠️ 请选择不同的气体';
+                    verifyBox.style.display = 'none';
+                    compareTable.style.display = 'none';
+                    resultArea.classList.add('disabled');
+                    calcBtn.disabled = true;
+                    return;
+                }
+
+                // 恢复正常状态
+                resultArea.classList.remove('disabled');
+                calcBtn.disabled = false;
+
+                gasNoteContainer.innerHTML = `<div class="highlight-box" id="gasNote">${scenario.note}</div>`;
+                // 重新获取引用
+                const newGasNote = document.getElementById('gasNote');
+
+                verifyBox.style.display = 'block';
+                compareTable.style.display = 'block';
+
+                let verifyText = '';
+                let formulaText = '';
+                let verifyClass = 'verify-box';
+
+                // ===== 根据场景生成验证信息 =====
+                if (scenario.type === 'O2') {
+                    targetHint.textContent = `气质A为空气 → 目标为氧含量`;
+
+                    if (targetVal > 0 && targetVal <= O2_IN_AIR * 100) {
+                        const ratio = (targetVal / 100 / O2_IN_AIR * 100);
+                        verifyText =
+                            `✅ 目标氧含量 ${targetVal}% → 空气占比 = ${targetVal}% ÷ ${(O2_IN_AIR*100).toFixed(2)}% = ${ratio.toFixed(2)}%`;
+                        verifyClass = 'verify-box';
+                        formulaText =
+                            `空气流量 = ${totalFlow} × (${targetVal} ÷ ${(O2_IN_AIR*100).toFixed(2)}) = ${(totalFlow * targetVal / (O2_IN_AIR*100)).toFixed(2)} Nm³/h`;
+                    } else if (targetVal > O2_IN_AIR * 100) {
+                        verifyText = `⚠️ 目标氧含量 ${targetVal}% 超过空气中氧含量 ${(O2_IN_AIR*100).toFixed(2)}%，无法达到！`;
+                        verifyClass = 'verify-box warning';
+                        formulaText = '⚠️ 目标值超出空气氧含量上限';
+                    } else {
+                        verifyText = `请输入有效目标值 (0~${(O2_IN_AIR*100).toFixed(2)})`;
+                        verifyClass = 'verify-box info';
+                        formulaText = '等待输入有效目标值';
+                    }
+                } else if (scenario.type === 'H2') {
+                    targetHint.textContent = `气质A为氢气 → 目标为氢含量`;
+                    verifyText = `✅ 目标氢含量 ${targetVal}% → 氢气占比 = ${targetVal}% (直接体积分数)`;
+                    verifyClass = 'verify-box';
+                    formulaText =
+                        `氢气流量 = ${totalFlow} × (${targetVal} ÷ 100) = ${(totalFlow * targetVal / 100).toFixed(2)} Nm³/h`;
+                } else if (scenario.type === 'VOL_AIR') {
+                    targetHint.textContent = `气质A为${a.name} → 目标为${a.name}体积分数 (空气中带入氧)`;
+                    const airFlow = totalFlow * (1 - targetVal / 100);
+                    const actualO2 = (airFlow * O2_IN_AIR / totalFlow) * 100;
+                    verifyText =
+                        `✅ 目标${a.name}浓度 ${targetVal}% → ${a.name}占比 = ${targetVal}% (空气带入氧 ${actualO2.toFixed(2)}%)`;
+                    verifyClass = 'verify-box info';
+                    formulaText =
+                        `${a.name}流量 = ${totalFlow} × (${targetVal} ÷ 100) = ${(totalFlow * targetVal / 100).toFixed(2)} Nm³/h`;
+                } else {
+                    targetHint.textContent = `气质A为${a.name} → 目标为${a.name}体积分数 (直接配比)`;
+                    verifyText = `✅ 目标${a.name}浓度 ${targetVal}% → ${a.name}占比 = ${targetVal}% (直接体积分数)`;
+                    verifyClass = 'verify-box inert';
+                    formulaText =
+                        `${a.name}流量 = ${totalFlow} × (${targetVal} ÷ 100) = ${(totalFlow * targetVal / 100).toFixed(2)} Nm³/h`;
+                }
+
+                verifyBox.textContent = verifyText;
+                verifyBox.className = verifyClass;
+
+                compareTable.innerHTML = `
+                        <table>
+                            <tr><td class="label-cell">📐 配比公式</td><td class="value-cell">${scenario.formula}</td></tr>
+                            <tr><td class="label-cell">🔢 当前计算</td><td class="value-cell">${formulaText}</td></tr>
+                        </table>
+                    `;
+            }
+
+            // 监听变化更新UI
+            gasAEl.addEventListener('change', function() {
+                checkSameGas();
+                updateUI();
+                scheduleCalculate();
+            });
+            gasBEl.addEventListener('change', function() {
+                checkSameGas();
+                updateUI();
+                scheduleCalculate();
+            });
+            targetConcEl.addEventListener('input', updateUI);
+            totalFlowEl.addEventListener('input', updateUI);
+
+            // 压力模式
+            pressureModeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isManual = this.value === 'manual';
+                    frontPressureEl.disabled = !isManual;
+                    frontPressureEl.style.background = isManual ? '#ffffff' : '#eef2f7';
+                    systemPressureDropEl.disabled = isManual;
+                    systemPressureDropEl.style.background = isManual ? '#eef2f7' : '#ffffff';
+                    if (!isManual) updateAutoPressure();
+                    updatePressureHint();
+                    scheduleCalculate();
+                });
+            });
+
+            function updateAutoPressure() {
+                const outP = parseFloat(outPressureEl.value) || 0.15;
+                const drop = parseFloat(systemPressureDropEl.value) || 0.08;
+                frontPressureEl.value = Math.round((outP + drop) * 1000) / 1000;
+            }
+
+            function updatePressureHint() {
+                const isManual = document.querySelector('input[name="pressureMode"]:checked').value === 'manual';
+                const outP = parseFloat(outPressureEl.value) || 0.15;
+                const frontP = parseFloat(frontPressureEl.value) || 0;
+                const drop = parseFloat(systemPressureDropEl.value) || 0.08;
+
+                if (isManual) {
+                    if (frontP < outP + 0.005) {
+                        pressureHintEl.textContent = `⚠️ 前端压力 ${frontP.toFixed(3)} MPa 应高于出口压力 ${outP.toFixed(3)} MPa`;
+                        pressureHintEl.style.color = '#b3413d';
+                    } else {
+                        pressureHintEl.textContent =
+                            `手动设定：前端压力 ${frontP.toFixed(3)} MPa | 压差 ${(frontP - outP).toFixed(3)} MPa`;
+                        pressureHintEl.style.color = '#4a6f8e';
+                    }
+                } else {
+                    pressureHintEl.textContent =
+                        `自动模式：前端压力 = 出口压力 ${outP.toFixed(2)} MPa + 压损 ${drop.toFixed(3)} MPa = ${(outP + drop).toFixed(3)} MPa`;
+                    pressureHintEl.style.color = '#4a6f8e';
+                }
+            }
+
+            outPressureEl.addEventListener('input', function() {
+                if (document.querySelector('input[name="pressureMode"]:checked').value !== 'manual') {
+                    updateAutoPressure();
+                }
+                updatePressureHint();
+            });
+
+            systemPressureDropEl.addEventListener('input', function() {
+                if (document.querySelector('input[name="pressureMode"]:checked').value !== 'manual') {
+                    updateAutoPressure();
+                    updatePressureHint();
+                }
+                const drop = parseFloat(this.value) || 0;
+                document.getElementById('pressureDetailTable').innerHTML =
+                    `💡 当前系统压损: <strong>${drop.toFixed(3)} MPa</strong> | 参考: 流量计 0.02~0.05 + 管道/阀门 0.01~0.03 + 混合器 0.01~0.03 + 裕量 0.01~0.02`;
+            });
+
+            frontPressureEl.addEventListener('input', function() {
+                if (this.disabled) return;
+                const val = parseFloat(this.value) || 0;
+                const outP = parseFloat(outPressureEl.value) || 0;
+                if (val < outP + 0.005) {
+                    pressureHintEl.textContent = `⚠️ 前端压力 ${val.toFixed(3)} MPa 应高于出口压力 ${outP.toFixed(3)} MPa`;
+                    pressureHintEl.style.color = '#b3413d';
+                } else {
+                    pressureHintEl.textContent = `手动设定：前端压力 ${val.toFixed(3)} MPa | 压差 ${(val - outP).toFixed(3)} MPa`;
+                    pressureHintEl.style.color = '#4a6f8e';
+                }
+            });
+
+            let timeoutId;
+
+            function scheduleCalculate() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(calculate, 200);
+            }
+
+            // ========== 核心计算 ==========
+            function calculate() {
+                const totalFlowNm3 = parseFloat(totalFlowEl.value);
+                const outPressure = parseFloat(outPressureEl.value);
+                const targetConc = parseFloat(targetConcEl.value);
+                const gasAKey = gasAEl.value;
+                const gasBKey = gasBEl.value;
+
+                // 检查是否同一种气体
+                if (gasAKey === gasBKey) {
+                    // 显示错误结果
+                    document.getElementById('resultGrid').innerHTML = `
+                            <div class="result-item" style="grid-column:1/-1; text-align:center; color:#dc3545; padding:1.5rem;">
+                                <div style="font-size:2rem; margin-bottom:0.5rem;">⚠️</div>
+                                <div style="font-size:1.1rem; font-weight:600;">气质A和B不能为同一种气体</div>
+                                <div style="font-size:0.85rem; margin-top:0.3rem; color:#666;">请选择不同的气体组分进行混合配比</div>
+                            </div>
+                        `;
+                    document.getElementById('pressureDisplay').innerHTML = '—';
+                    document.getElementById('pressureDetail').textContent = '请选择不同气体';
+                    document.getElementById('flowSummary').textContent = '⚠️ 请选择不同的气体组分';
+                    return;
+                }
+
+                let frontPressure = parseFloat(frontPressureEl.value);
+                const isManual = document.querySelector('input[name="pressureMode"]:checked').value === 'manual';
+                if (!isManual) { updateAutoPressure();
+                    frontPressure = parseFloat(frontPressureEl.value); }
+
+                if (isNaN(totalFlowNm3) || totalFlowNm3 <= 0) { alert('请输入有效总流量'); return; }
+                if (isNaN(outPressure) || outPressure <= 0) { alert('请输入有效出口压力'); return; }
+                if (isNaN(targetConc) || targetConc < 0 || targetConc > 100) { alert('目标浓度 0~100'); return; }
+                if (isNaN(frontPressure) || frontPressure <= 0) { alert('请输入有效前端压力'); return; }
+                if (frontPressure < outPressure) { alert(`前端压力 ${frontPressure.toFixed(3)} MPa 低于出口压力`); return; }
+
+                const gasA = gasMap[gasAKey];
+                const gasB = gasMap[gasBKey];
+                const scenario = getScenario(gasAKey, gasBKey);
+
+                let flowA_Nm3, flowB_Nm3, concA_actual, concB_actual;
+                let targetInfo = '';
+
+                // ===== 根据场景类型计算 =====
+                if (scenario.type === 'O2') {
+                    const ratioA = (targetConc / 100) / O2_IN_AIR;
+                    if (ratioA > 1) {
+                        alert(`目标氧含量 ${targetConc}% 过高！空气中仅含 ${(O2_IN_AIR*100).toFixed(2)}% 氧`);
+                        return;
+                    }
+                    flowA_Nm3 = totalFlowNm3 * ratioA;
+                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
+                    concA_actual = (flowA_Nm3 / totalFlowNm3) * 100;
+                    concB_actual = 100 - concA_actual;
+                    targetInfo = `氧含量 ${targetConc}% (空气贡献)`;
+                } else if (scenario.type === 'H2') {
+                    const ratioA = targetConc / 100;
+                    flowA_Nm3 = totalFlowNm3 * ratioA;
+                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
+                    concA_actual = ratioA * 100;
+                    concB_actual = 100 - concA_actual;
+                    targetInfo = `氢含量 ${targetConc}%`;
+                } else if (scenario.type === 'VOL_AIR') {
+                    const ratioA = targetConc / 100;
+                    flowA_Nm3 = totalFlowNm3 * ratioA;
+                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
+                    concA_actual = ratioA * 100;
+                    concB_actual = 100 - concA_actual;
+                    const actualO2 = (flowB_Nm3 * O2_IN_AIR / totalFlowNm3) * 100;
+                    targetInfo = `${gasA.name} ${targetConc}% (空气带入氧 ${actualO2.toFixed(2)}%)`;
+                } else {
+                    const ratioA = targetConc / 100;
+                    flowA_Nm3 = totalFlowNm3 * ratioA;
+                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
+                    concA_actual = ratioA * 100;
+                    concB_actual = 100 - concA_actual;
+                    targetInfo = `${gasA.name} ${targetConc}% (惰性混合)`;
+                }
+
+                if (flowA_Nm3 < 0) flowA_Nm3 = 0;
+                if (flowB_Nm3 < 0) flowB_Nm3 = 0;
+
+                const flowA_Lmin = flowA_Nm3 * NM3_TO_LMIN;
+                const flowB_Lmin = flowB_Nm3 * NM3_TO_LMIN;
+                const totalLmin = totalFlowNm3 * NM3_TO_LMIN;
+                const pressureDiff = frontPressure - outPressure;
+
+                document.getElementById('resultGrid').innerHTML = `
+                        <div class="result-item">
+                            <div class="label">🧪 气质A · ${gasA.name}</div>
+                            <div class="value">${flowA_Lmin.toFixed(2)} <span class="unit">L/min</span></div>
+                            <div class="sub-info">占比 ${concA_actual.toFixed(1)}%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">🧪 气质B · ${gasB.name}</div>
+                            <div class="value">${flowB_Lmin.toFixed(2)} <span class="unit">L/min</span></div>
+                            <div class="sub-info">占比 ${concB_actual.toFixed(1)}%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="label">📈 总流量 (标况)</div>
+                            <div class="value">${totalLmin.toFixed(2)} <span class="unit">L/min</span></div>
+                            <div class="sub-info">${totalFlowNm3.toFixed(2)} Nm³/h</div>
+                        </div>
+                    `;
+
+                const modeText = isManual ? '手动' : '自动';
+                document.getElementById('pressureDisplay').innerHTML = `
+                        <span style="background:#ffffff;padding:0.1rem 0.9rem;border-radius:30px;font-weight:700;">${frontPressure.toFixed(3)} MPa</span>
+                        <span style="margin-left:12px;font-weight:400;color:#15456b;font-size:0.85rem;">(${modeText})</span>
+                    `;
+                document.getElementById('pressureDetail').textContent =
+                    `出口 ${outPressure.toFixed(3)} MPa · 压差 ${pressureDiff.toFixed(3)} MPa`;
+                document.getElementById('flowSummary').textContent =
+                    `总流量 ${totalFlowNm3.toFixed(2)} Nm³/h → ${targetInfo} · 出口 ${outPressure.toFixed(3)} MPa · 前端 ${frontPressure.toFixed(3)} MPa`;
+
+                updateUI();
+            }
+
+            document.getElementById('calcBtn').addEventListener('click', calculate);
+            [totalFlowEl, outPressureEl, targetConcEl, frontPressureEl, systemPressureDropEl].forEach(el => {
+                el.addEventListener('input', scheduleCalculate);
+                el.addEventListener('change', calculate);
+            });
+            pressureModeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    scheduleCalculate();
+                    setTimeout(updatePressureHint, 50);
+                });
+            });
+
+            // 初始化 - 空气+氮气示例
+            window.addEventListener('load', function() {
+                totalFlowEl.value = '15';
+                outPressureEl.value = '0.15';
+                targetConcEl.value = '7';
+                gasAEl.value = 'air';
+                gasBEl.value = 'nitrogen';
+                systemPressureDropEl.value = '0.08';
+                document.querySelector('input[name="pressureMode"][value="auto"]').checked = true;
+                frontPressureEl.disabled = true;
+                frontPressureEl.style.background = '#eef2f7';
+                checkSameGas();
+                updateUI();
+                updateAutoPressure();
+                updatePressureHint();
+                calculate();
+            });
+
+            window.calculate = calculate;
+            window.updateUI = updateUI;
+        })();
+    </script>
+</body>
+</html>
