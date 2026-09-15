@@ -1,1443 +1,1020 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>配比柜计算</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高纯气体 · 自产纯化 vs 外购 横向对比（氩/氮切换）</title>
     <style>
-        /* ===== 极简重置 ===== */
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
-
         body {
-            background: #f1f5f9;
-            padding: 8px;
+            background: #eef4f9;
+            margin: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            padding: 20px;
         }
-
-        .app {
-            max-width: 420px;
+        .card {
+            max-width: 1600px;
             width: 100%;
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 12px 14px 16px;
-            box-shadow: 0 4px 24px rgba(0, 20, 40, 0.06);
+            background: white;
+            border-radius: 36px;
+            box-shadow: 0 24px 48px -16px rgba(0,20,40,0.30);
+            padding: 28px 32px 36px;
         }
-
-        /* ===== 顶栏 精简 ===== */
         .header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding-bottom: 8px;
-            border-bottom: 1.5px solid #edf2f7;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+            gap: 12px;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 600;
+            margin: 0;
+            color: #0a2942;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .gas-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #e9f1f9;
+            padding: 6px 16px 6px 20px;
+            border-radius: 60px;
+            border: 1px solid #c5d9e8;
+        }
+        .gas-selector label {
+            font-weight: 600;
+            color: #1a3d5e;
+            font-size: 14px;
+        }
+        .gas-selector select {
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid #c5d9e8;
+            font-size: 15px;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+        }
+        .badge {
+            background: #1f6390;
+            color: white;
+            border-radius: 40px;
+            padding: 2px 18px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .sub {
+            color: #1f4c6e;
+            font-size: 14px;
+            margin: 0 0 24px 0;
+            border-left: 4px solid #2f86b9;
+            padding-left: 16px;
+            background: #e9f1f9;
+            border-radius: 0 14px 14px 0;
+            line-height: 1.6;
+        }
+        .sub .gas-name {
+            font-weight: 700;
+            color: #0a2942;
+        }
+
+        /* 左右双栏 —— 始终横向对齐 */
+        .two-col {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 30px;
+            align-items: stretch;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .two-col .col {
+            flex: 1 1 0;
+            min-width: 420px;
+            background: #f8fbfe;
+            border-radius: 28px;
+            padding: 20px 24px 24px;
+            border: 1px solid #deeaf5;
+            display: flex;
+            flex-direction: column;
+        }
+        @media (max-width: 960px) {
+            .two-col { gap: 20px; }
+            .two-col .col { min-width: 380px; padding: 16px 18px 20px; }
+        }
+        @media (max-width: 720px) {
+            .two-col .col { min-width: 340px; padding: 14px 14px 18px; }
+        }
+
+        .col-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .col-title .tag {
+            font-size: 12px;
+            padding: 2px 16px;
+            border-radius: 40px;
+            color: white;
+            white-space: nowrap;
+        }
+        .col-title .tag.green { background: #1e7a5e; }
+        .col-title .tag.orange { background: #b5712a; }
+
+        .param-group {
+            margin-bottom: 18px;
+            flex-shrink: 0;
+        }
+        .param-group h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: #1a3d5e;
+            border-bottom: 2px solid #dbe8f3;
+            padding-bottom: 6px;
+        }
+        .param-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 4px 10px;
+        }
+        .param-row label {
+            min-width: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a3b57;
+        }
+        .param-row input[type="number"] {
+            flex: 1;
+            min-width: 70px;
+            padding: 6px 10px;
+            border: 1px solid #c5d9e8;
+            border-radius: 40px;
+            font-size: 13px;
+            background: white;
+            font-weight: 500;
+            color: #062438;
+        }
+        .param-row input[type="range"] {
+            flex: 1.5;
+            min-width: 80px;
+            accent-color: #1e6f9e;
+        }
+        .param-row select {
+            flex: 1;
+            min-width: 80px;
+            padding: 6px 10px;
+            border: 1px solid #c5d9e8;
+            border-radius: 40px;
+            font-size: 13px;
+            background: white;
+        }
+        .param-row .unit {
+            font-size: 12px;
+            color: #2e5a7a;
+            min-width: 24px;
+        }
+        .hint {
+            background: #e5eff7;
+            border-radius: 30px;
+            padding: 2px 16px;
+            font-size: 12px;
+            color: #10446a;
+            display: inline-block;
+        }
+        .empty-placeholder {
+            color: #8aaec9;
+            font-size: 13px;
+            padding: 12px 0 8px 0;
+            font-style: italic;
+            border-bottom: 1px dashed #dbe8f3;
             margin-bottom: 10px;
         }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo-icon {
-            font-size: 18px;
-            width: 32px;
-            height: 32px;
-            background: #e8f0fe;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .header-title h1 {
-            font-size: 15px;
-            font-weight: 700;
-            color: #0b2a44;
-            line-height: 1.2;
-        }
-
-        .header-title .sub {
-            font-size: 9px;
-            font-weight: 400;
-            color: #5f7d9c;
-            background: #eef4f8;
-            padding: 0 8px;
-            border-radius: 20px;
-        }
-
-        .badge-air {
-            font-size: 9px;
-            font-weight: 600;
-            color: #1a56db;
-            background: #dbeafe;
-            padding: 2px 10px;
+        .risk-warning {
+            background: #fef3d0;
             border-radius: 30px;
-            border: 1px solid #bfdbfe;
-            white-space: nowrap;
-        }
-
-        /* ===== 卡片面板 紧凑 ===== */
-        .panel {
-            background: #fafcfe;
-            border-radius: 12px;
-            padding: 10px 12px 12px;
-            border: 1px solid #e9eef3;
-            margin-bottom: 8px;
-        }
-
-        .panel-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: #1a3d5e;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 8px;
-        }
-        .panel-title .icon {
-            font-size: 13px;
-        }
-
-        /* ===== 表单字段 紧凑 ===== */
-        .field {
-            margin-bottom: 6px;
-        }
-        .field:last-child {
-            margin-bottom: 0;
-        }
-
-        .field-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .field-row .field-label {
-            font-size: 11px;
-            font-weight: 500;
-            color: #1f4665;
-            white-space: nowrap;
-            min-width: 52px;
-        }
-
-        .field-row .field-label .hint {
-            font-weight: 400;
-            font-size: 9px;
-            color: #7a96b2;
-        }
-
-        .field-row input,
-        .field-row select {
-            flex: 1;
-            padding: 5px 8px;
-            border: 1.5px solid #dce4ed;
-            border-radius: 8px;
-            background: #ffffff;
-            font-size: 13px;
-            font-weight: 500;
-            color: #0a2a44;
-            outline: none;
-            transition: 0.15s;
-            -webkit-appearance: none;
-            appearance: none;
-            min-width: 0;
-        }
-
-        .field-row input:focus,
-        .field-row select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
-        }
-
-        .field-row input:disabled {
-            background: #f1f5f9;
-            color: #6f8aa8;
-        }
-
-        .field-row input.error,
-        .field-row select.error {
-            border-color: #dc2626;
-            background: #fef2f2;
-        }
-
-        .field-row .target-badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 10px;
-            border-radius: 30px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .target-badge.o2 {
-            background: #dbeafe;
-            color: #1a56db;
-        }
-        .target-badge.h2 {
-            background: #fef3c7;
-            color: #b45309;
-        }
-        .target-badge.vol {
-            background: #e6edf5;
-            color: #1a4463;
-        }
-        .target-badge.inert {
-            background: #f1f3f5;
-            color: #5a6a7a;
-        }
-        .target-badge.error {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .scenario-tag {
-            font-size: 9px;
-            font-weight: 600;
-            padding: 1px 10px;
-            border-radius: 30px;
-            background: #e6edf5;
-            color: #1a4463;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .scenario-tag.active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        .scenario-tag.error {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .field-hint {
-            font-size: 10px;
-            color: #7a96b2;
-            margin-top: 2px;
-            padding-left: 2px;
-        }
-
-        /* ===== 气体选择行 紧凑 ===== */
-        .gas-row {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            background: #f1f6fb;
-            padding: 4px 8px 4px 10px;
-            border-radius: 10px;
-            margin-top: 3px;
-        }
-        .gas-row+.gas-row {
-            margin-top: 5px;
-        }
-
-        .gas-row .label-letter {
-            font-weight: 700;
+            padding: 4px 16px;
             font-size: 12px;
-            color: #1a3d5e;
-            min-width: 14px;
+            color: #7a5d1a;
+            display: inline-block;
+            border: 1px solid #f5d98a;
         }
-
-        .gas-row select {
-            flex: 1;
-            min-width: 60px;
-            padding: 4px 6px;
-            border: 1.5px solid #dce4ed;
-            border-radius: 6px;
-            background: #ffffff;
-            font-size: 12px;
-            font-weight: 500;
-            color: #0a2a44;
-            outline: none;
-            transition: 0.15s;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .gas-row select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.06);
-        }
-
-        .gas-row select.error {
-            border-color: #dc2626;
-            background: #fef2f2;
-        }
-
-        .gas-tag {
-            font-size: 9px;
-            font-weight: 600;
-            padding: 1px 8px;
-            border-radius: 30px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .gas-tag.air {
-            background: #dbeafe;
-            color: #1a56db;
-        }
-        .gas-tag.h2 {
-            background: #fef3c7;
-            color: #b45309;
-        }
-        .gas-tag.inert {
-            background: #e6edf5;
-            color: #1a4463;
-        }
-
-        .gas-row .role {
-            font-size: 9px;
-            color: #7a96b2;
-            font-weight: 400;
-            white-space: nowrap;
-        }
-
-        .gas-warning {
-            font-size: 10px;
-            font-weight: 600;
-            color: #dc2626;
-            margin-left: auto;
-        }
-
-        /* ===== 提示框 紧凑 ===== */
-        .note-box {
-            border-radius: 10px;
-            padding: 5px 12px;
-            font-size: 11px;
-            margin-top: 6px;
-            line-height: 1.4;
-        }
-        .note-box.default {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            color: #78350f;
-        }
-        .note-box.error {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            color: #991b1b;
-        }
-        .note-box.info {
-            background: #eff6ff;
-            border: 1px solid #93c5fd;
-            color: #1e40af;
-        }
-        .note-box.inert {
-            background: #f8fafc;
-            border: 1px solid #d1d9e6;
-            color: #334155;
-        }
-
-        /* ===== 验证框 紧凑 ===== */
-        .verify-box {
-            border-radius: 10px;
-            padding: 5px 12px;
-            font-size: 11px;
-            margin-top: 5px;
-            line-height: 1.4;
-        }
-        .verify-box.success {
-            background: #f0fdf4;
-            border: 1px solid #86efac;
-            color: #166534;
-        }
-        .verify-box.warning {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            color: #991b1b;
-        }
-        .verify-box.info {
-            background: #eff6ff;
-            border: 1px solid #93c5fd;
-            color: #1e40af;
-        }
-        .verify-box.inert {
-            background: #f8fafc;
-            border: 1px solid #d1d9e6;
-            color: #334155;
-        }
-        .verify-box.hidden {
-            display: none;
-        }
-
-        /* ===== 公式框 紧凑 ===== */
-        .formula-box {
-            margin-top: 5px;
-            background: #f1f6fb;
-            border-radius: 10px;
-            padding: 5px 12px;
-            font-size: 11px;
-            border: 1px solid #e2eaf2;
-            line-height: 1.5;
-        }
-        .formula-box .row {
+        .mode-switch-row {
             display: flex;
-            justify-content: space-between;
-            padding: 1px 0;
-        }
-        .formula-box .label-cell {
-            font-weight: 500;
-            color: #1a405e;
-        }
-        .formula-box .value-cell {
-            font-weight: 600;
-            color: #07273f;
-            text-align: right;
-            font-family: "SF Mono", monospace;
-            font-size: 10px;
-        }
-        .formula-box.hidden {
-            display: none;
-        }
-
-        /* ===== 压力配置栏 紧凑 ===== */
-        .pressure-bar {
-            background: #f1f6fb;
-            border-radius: 12px;
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            border: 1px solid #e2eaf2;
-        }
-
-        .pressure-row {
-            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
-            align-items: center;
-            gap: 4px 8px;
         }
-
-        .pressure-label {
+        .mode-switch-row label {
             font-weight: 600;
-            color: #1a4568;
-            font-size: 11px;
-        }
-
-        .pressure-mode {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .pressure-mode label {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 11px;
-            font-weight: 500;
-            color: #1a405e;
-            cursor: pointer;
-        }
-
-        .pressure-mode input[type="radio"] {
-            width: 13px;
-            height: 13px;
-            accent-color: #2563eb;
-            margin: 0;
-        }
-
-        .pressure-input-group {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .pressure-input-group label {
-            font-size: 10px;
-            font-weight: 500;
-            color: #1a4568;
-        }
-
-        .pressure-input-group input {
-            width: 56px;
-            padding: 3px 4px;
-            border: 1.5px solid #dce4ed;
-            border-radius: 16px;
-            background: #ffffff;
-            font-size: 12px;
-            font-weight: 600;
-            color: #0a2a44;
-            text-align: center;
-            outline: none;
-            transition: 0.15s;
-        }
-
-        .pressure-input-group input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.06);
-        }
-
-        .pressure-input-group input:disabled {
-            background: #e6edf5;
-            color: #6f8aa8;
-        }
-
-        .pressure-input-group .unit {
-            font-size: 10px;
-            font-weight: 500;
-            color: #1a4568;
-        }
-
-        .pressure-hint {
-            font-size: 10px;
-            color: #5f7d9c;
-            margin-top: 2px;
-            width: 100%;
-        }
-
-        .pressure-detail {
-            font-size: 10px;
-            color: #2a5a7a;
-            background: #e6edf5;
-            padding: 1px 10px;
-            border-radius: 30px;
-            white-space: nowrap;
-        }
-
-        /* ===== 计算按钮 紧凑 ===== */
-        .btn-row {
-            display: flex;
-            justify-content: center;
-            margin: 2px 0 8px;
-        }
-
-        .btn-calc {
-            background: #1a5fb0;
-            border: none;
-            color: white;
-            font-weight: 700;
+            color: #1a3d5e;
             font-size: 14px;
-            padding: 9px 20px;
-            border-radius: 60px;
-            cursor: pointer;
-            transition: 0.15s;
-            box-shadow: 0 4px 16px -4px rgba(26, 85, 160, 0.25);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            width: 100%;
-            justify-content: center;
+        }
+        .mode-switch-row select {
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid #c5d9e8;
+            font-size: 13px;
+            background: white;
         }
 
-        .btn-calc:active {
-            transform: scale(0.97);
+        /* 结果区 */
+        .results {
+            margin-top: 28px;
+            background: #e7f0f8;
+            border-radius: 28px;
+            padding: 22px 28px;
+            border: 1px solid #c4d8e9;
         }
-
-        .btn-calc:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-            box-shadow: none;
+        .results h2 {
+            font-size: 20px;
+            margin: 0 0 16px 0;
+            color: #0b2b4a;
         }
-
-        /* ===== 结果区域 紧凑 ===== */
-        .result-area {
-            background: #f1f6fb;
-            border-radius: 12px;
-            padding: 10px 12px 12px;
-            border-left: 3px solid #2563eb;
-            transition: 0.2s;
-        }
-
-        .result-area.disabled {
-            opacity: 0.5;
-            border-left-color: #94a3b8;
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .result-header .title {
-            font-weight: 700;
-            font-size: 11px;
-            color: #0d3450;
-        }
-
-        .result-header .std-badge {
-            font-size: 8px;
-            background: #dce4ed;
-            padding: 1px 8px;
-            border-radius: 30px;
-            color: #1a4463;
-            font-weight: 500;
-        }
-
         .result-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 5px;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 30px;
+        }
+        @media (max-width: 700px) {
+            .result-grid { grid-template-columns: 1fr; }
         }
 
-        .result-card {
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 6px 8px;
-            border: 1px solid #dce8f2;
+        .result-block {
+            background: white;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid #cfdfef;
         }
-
-        .result-card .r-label {
-            font-size: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-            color: #5f7d9c;
+        .result-block .block-title {
             font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .result-card .r-value {
-            font-size: 15px;
-            font-weight: 700;
-            color: #07273f;
-            line-height: 1.2;
-        }
-
-        .result-card .r-value .r-unit {
-            font-size: 10px;
-            font-weight: 400;
-            color: #5f7d9c;
-            margin-left: 2px;
-        }
-
-        .result-card .r-sub {
-            font-size: 9px;
-            color: #5f7d9c;
-        }
-
-        .result-footer {
+            font-size: 16px;
+            color: #0b2b4a;
+            margin-bottom: 12px;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            gap: 4px 10px;
+            gap: 10px;
+        }
+        .result-block .block-title .tag {
+            font-size: 11px;
+            padding: 1px 14px;
+            border-radius: 40px;
+            color: white;
+        }
+        .result-block .block-title .tag.green { background: #1e7a5e; }
+        .result-block .block-title .tag.orange { background: #b5712a; }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px dashed #e5eef5;
+            font-size: 14px;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-item .label { color: #2a5375; }
+        .result-item .value { font-weight: 600; color: #03223d; }
+        .result-item .value.green { color: #1a7a4e; }
+        .result-item .value.orange { color: #b86b1a; }
+        .result-item .value.blue { color: #1f6390; }
+        .result-item .value.red { color: #b33c3c; }
+
+        .vs-row {
+            background: #f0f6fd;
+            border-radius: 14px;
+            padding: 10px 14px;
             margin-top: 6px;
-            background: #e6edf5;
-            padding: 4px 12px;
-            border-radius: 30px;
-        }
-
-        .result-footer .label {
-            font-weight: 600;
-            color: #1a4568;
-            font-size: 10px;
-        }
-
-        .result-footer .value {
-            font-weight: 700;
-            color: #004080;
-            font-size: 12px;
-        }
-
-        .result-footer .detail {
-            font-size: 10px;
-            color: #1a4a6b;
-        }
-
-        .result-summary {
-            margin-top: 5px;
-            font-size: 10px;
-            color: #1a4a6b;
-            background: #dce8f2;
-            padding: 3px 12px;
-            border-radius: 30px;
-            text-align: center;
-            width: 100%;
-        }
-
-        /* ===== 错误占位 ===== */
-        .error-placeholder {
-            grid-column: 1 / -1;
-            text-align: center;
-            color: #dc2626;
-            padding: 8px 4px;
-        }
-        .error-placeholder .big {
-            font-size: 20px;
-            display: block;
-        }
-        .error-placeholder .main {
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .error-placeholder .sub {
-            font-size: 10px;
-            color: #5f7d9c;
-        }
-
-        /* ===== 底部示例 - 可折叠精简 ===== */
-        .footer-examples {
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1.5px solid #edf2f7;
-        }
-
-        .footer-toggle {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 4px;
-            font-size: 10px;
-            color: #5f7d9c;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 2px 0;
-            width: 100%;
-            justify-content: center;
-            font-weight: 500;
+            border: 1px solid #cfe0ee;
         }
+        .vs-row .label { font-weight: 600; color: #1a3d5e; }
+        .vs-row .value { font-weight: 700; font-size: 16px; }
 
-        .footer-toggle:active {
-            opacity: 0.6;
-        }
-
-        .footer-toggle .arrow {
-            transition: transform 0.2s;
-            display: inline-block;
-            font-size: 10px;
-        }
-
-        .footer-toggle .arrow.open {
-            transform: rotate(180deg);
-        }
-
-        .footer-examples-list {
+        .footnote {
+            margin-top: 18px;
+            color: #255473;
+            font-size: 13px;
+            border-top: 1px solid #bbd2e4;
+            padding-top: 14px;
             display: flex;
             flex-wrap: wrap;
-            gap: 3px 6px;
-            margin-top: 4px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.25s ease, opacity 0.2s ease;
-            opacity: 0;
+            justify-content: space-between;
+            gap: 12px;
         }
-
-        .footer-examples-list.open {
-            max-height: 200px;
-            opacity: 1;
-        }
-
-        .footer-examples-list .ex {
-            background: #f1f6fb;
-            padding: 1px 8px;
-            border-radius: 30px;
-            font-size: 9px;
+        .btn-reset {
+            background: #d3e2f0;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 20px;
             font-weight: 500;
-            color: #3a5a7a;
+            color: #124062;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.1s;
             white-space: nowrap;
         }
-
-        /* ===== 隐藏辅助 ===== */
-        .hidden {
-            display: none !important;
+        .btn-reset:hover { background: #b8cfe0; }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
-
-        /* ===== 极小屏适配 ===== */
-        @media (max-width: 380px) {
-            .app {
-                padding: 8px 10px 12px;
-            }
-            .result-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .result-grid .result-card:last-child {
-                grid-column: 1 / -1;
-            }
-            .pressure-row {
-                gap: 3px 6px;
-            }
-            .gas-row {
-                flex-wrap: wrap;
-                gap: 3px;
-            }
-            .gas-row select {
-                min-width: 50px;
-                font-size: 11px;
-            }
-            .field-row .field-label {
-                min-width: 40px;
-                font-size: 10px;
-            }
-            .field-row input {
-                font-size: 12px;
-                padding: 4px 6px;
-            }
-            .header-title h1 {
-                font-size: 13px;
-            }
-            .badge-air {
-                font-size: 8px;
-                padding: 1px 8px;
-            }
+        .shared-param-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 4px 10px;
         }
+        .shared-param-row label {
+            min-width: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a3b57;
+        }
+        .shared-param-row span {
+            font-weight: 600;
+            color: #1a3d5e;
+            font-size: 14px;
+        }
+        .info-box {
+            font-size: 13px;
+            color: #3a627f;
+            background: #ecf3f9;
+            border-radius: 30px;
+            padding: 6px 16px;
+            margin-top: 6px;
+        }
+        .gas-tag {
+            display: inline-block;
+            font-size: 12px;
+            padding: 2px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+        .gas-tag.ar { background: #d4edda; color: #155724; }
+        .gas-tag.n2 { background: #cce5ff; color: #004085; }
 
-        @media (max-width: 340px) {
-            .result-grid {
-                grid-template-columns: 1fr;
-            }
-            .result-grid .result-card:last-child {
-                grid-column: 1;
-            }
-            .pressure-input-group input {
-                width: 46px;
-                font-size: 11px;
-            }
-            .btn-calc {
-                font-size: 13px;
-                padding: 7px 16px;
-            }
+        /* 气体专属提示 */
+        .gas-note {
+            font-size: 12px;
+            color: #3a627f;
+            background: #ecf3f9;
+            border-radius: 30px;
+            padding: 4px 16px;
+            margin-top: 4px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-
-    <div class="app">
-
-        <!-- ===== 顶栏 ===== -->
-        <div class="header">
-            <div class="header-left">
-                <div class="logo-icon">⚙️</div>
-                <div class="header-title">
-                    <h1>配比柜流量 <span class="sub">计算器</span></h1>
-                </div>
-            </div>
-            <span class="badge-air">🌬 含氧20.95%</span>
-        </div>
-
-        <!-- ===== 面板：总条件 ===== -->
-        <div class="panel">
-            <div class="panel-title"><span class="icon">📦</span> 输出条件</div>
-
-            <div class="field">
-                <div class="field-row">
-                    <span class="field-label">流量 <span class="hint">Nm³/h</span></span>
-                    <input type="number" id="totalFlow" value="15" step="0.1" min="0.1">
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="field-row">
-                    <span class="field-label">出口 <span class="hint">MPa</span></span>
-                    <input type="number" id="outPressure" value="0.15" step="0.01" min="0.01">
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="field-row">
-                    <span class="field-label">目标</span>
-                    <input type="number" id="targetConc" value="7" step="0.1" min="0" max="100" style="flex:1.2;">
-                    <span id="targetBadge" class="target-badge o2">氧含量</span>
-                    <span id="scenarioTag" class="scenario-tag active">含氧</span>
-                </div>
-                <div class="field-hint" id="targetHint">空气→氧含量</div>
-            </div>
-        </div>
-
-        <!-- ===== 面板：气体组分 ===== -->
-        <div class="panel">
-            <div class="panel-title">
-                <span class="icon">🧪</span> 气体
-                <span class="gas-warning" id="sameGasWarning"></span>
-            </div>
-
-            <div class="gas-row">
-                <span class="label-letter">A</span>
-                <select id="gasA">
-                    <option value="air">空气</option>
-                    <option value="nitrogen">氮气</option>
-                    <option value="hydrogen">氢气</option>
-                    <option value="argon">氩气</option>
-                    <option value="methane">甲烷</option>
-                    <option value="carbonDioxide">二氧化碳</option>
+<div class="card">
+    <div class="header">
+        <h1>🧪 高纯气体 · 自产纯化 vs 外购</h1>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div class="gas-selector">
+                <label for="gasTypeSelect">🔁 气体</label>
+                <select id="gasTypeSelect">
+                    <option value="ar">氩气 (Ar)</option>
+                    <option value="n2">氮气 (N₂)</option>
                 </select>
-                <span class="role">目标</span>
-                <span id="gasABadge" class="gas-tag air">⚡含氧</span>
             </div>
-
-            <div class="gas-row">
-                <span class="label-letter">B</span>
-                <select id="gasB">
-                    <option value="air">空气</option>
-                    <option value="nitrogen" selected>氮气</option>
-                    <option value="hydrogen">氢气</option>
-                    <option value="argon">氩气</option>
-                    <option value="methane">甲烷</option>
-                    <option value="carbonDioxide">二氧化碳</option>
-                </select>
-                <span class="role">稀释</span>
-                <span id="gasBBadge" class="gas-tag inert">●惰性</span>
-            </div>
-
-            <div id="noteContainer">
-                <div class="note-box default" id="gasNote">💡 空气+氮气 → 氧含量</div>
-            </div>
-
-            <div id="verifyBox" class="verify-box success">
-                ✅ 7% → 空气占 33.41%
-            </div>
-
-            <div id="formulaBox" class="formula-box">
-                <div class="row"><span class="label-cell">公式</span><span class="value-cell">空气 = 流量 × (目标% ÷ 20.95%)</span></div>
-                <div class="row"><span class="label-cell">计算</span><span class="value-cell">15 × (7÷20.95) = 5.01 Nm³/h</span></div>
-            </div>
+            <span class="badge">📊 横向对比</span>
         </div>
-
-        <!-- ===== 压力配置 ===== -->
-        <div class="pressure-bar">
-            <div class="pressure-row">
-                <span class="pressure-label">🔧 前端</span>
-
-                <div class="pressure-mode">
-                    <label><input type="radio" name="pressureMode" value="auto" checked> 自动</label>
-                    <label><input type="radio" name="pressureMode" value="manual"> 手动</label>
-                </div>
-
-                <div class="pressure-input-group">
-                    <label>压损</label>
-                    <input type="number" id="systemPressureDrop" value="0.08" step="0.005" min="0.01">
-                    <span class="unit">MPa</span>
-                </div>
-
-                <div class="pressure-input-group">
-                    <label>前端</label>
-                    <input type="number" id="frontPressure" value="0.23" step="0.01" min="0.01" disabled>
-                    <span class="unit">MPa</span>
-                </div>
-
-                <span class="pressure-detail" id="pressureDetailBadge">压差 0.080</span>
-            </div>
-            <div class="pressure-hint" id="pressureHint">自动：前端 = 出口 + 压损</div>
-        </div>
-
-        <!-- ===== 计算按钮 ===== -->
-        <div class="btn-row">
-            <button class="btn-calc" id="calcBtn">
-                <span>⟳</span> 计算
-            </button>
-        </div>
-
-        <!-- ===== 结果区域 ===== -->
-        <div class="result-area" id="resultArea">
-            <div class="result-header">
-                <span class="title">📊 流量计设置</span>
-                <span class="std-badge">标况</span>
-            </div>
-
-            <div class="result-grid" id="resultGrid">
-                <div class="result-card">
-                    <div class="r-label">A · 空气</div>
-                    <div class="r-value">83.53 <span class="r-unit">L/min</span></div>
-                    <div class="r-sub">33.4%</div>
-                </div>
-                <div class="result-card">
-                    <div class="r-label">B · 氮气</div>
-                    <div class="r-value">166.47 <span class="r-unit">L/min</span></div>
-                    <div class="r-sub">66.6%</div>
-                </div>
-                <div class="result-card">
-                    <div class="r-label">总流量</div>
-                    <div class="r-value">250.00 <span class="r-unit">L/min</span></div>
-                    <div class="r-sub">15.00 Nm³/h</div>
-                </div>
-            </div>
-
-            <div class="result-footer">
-                <span class="label">💡 调压阀</span>
-                <span class="value" id="pressureDisplay">0.230 MPa</span>
-                <span class="detail" id="pressureDetail">出口 0.150 · 压差 0.080</span>
-            </div>
-
-            <div class="result-summary" id="flowSummary">
-                15.00 Nm³/h → 氧 7.0% · 出口 0.150 · 前端 0.230
-            </div>
-        </div>
-
-        <!-- ===== 底部示例 - 可折叠 ===== -->
-        <div class="footer-examples">
-            <button class="footer-toggle" id="footerToggle">
-                <span>📌 示例</span>
-                <span class="arrow" id="arrowIcon">▾</span>
-            </button>
-            <div class="footer-examples-list" id="exampleList">
-                <span class="ex">空气+氮气 · 15Nm³ · 7%O₂</span>
-                <span class="ex">空气+氩气 · 15Nm³ · 7%O₂</span>
-                <span class="ex">氢气+氮气 · 20Nm³ · 10%H₂</span>
-                <span class="ex">甲烷+氮气 · 20Nm³ · 15%CH₄</span>
-            </div>
-        </div>
-
+    </div>
+    <div class="sub" id="subHeader">
+        🔹 左栏：自产纯化（液<span class="gas-name" id="gasNameDisplay">氩</span>→充装→纯化）&nbsp;&nbsp;|&nbsp;&nbsp;右栏：外购高纯气/液 + 运输费 + 品质风险
     </div>
 
-    <script>
-        // ============================================================
-        //  JavaScript 逻辑
-        // ============================================================
-        (function() {
-            const O2_IN_AIR = 0.2095;
-            const gasMap = {
-                air: { name: '空气', molarMass: 28.97, isAir: true, isH2: false, property: '⚡含氧', badge: 'air' },
-                nitrogen: { name: '氮气', molarMass: 28.013, isAir: false, isH2: false, property: '●惰性', badge: 'inert' },
-                hydrogen: { name: '氢气', molarMass: 2.016, isAir: false, isH2: true, property: '🔥可燃', badge: 'h2' },
-                argon: { name: '氩气', molarMass: 39.948, isAir: false, isH2: false, property: '●惰性', badge: 'inert' },
-                methane: { name: '甲烷', molarMass: 16.043, isAir: false, isH2: false, property: '🔥可燃', badge: 'h2' },
-                carbonDioxide: { name: '二氧化碳', molarMass: 44.01, isAir: false, isH2: false, property: '●惰性', badge: 'inert' }
-            };
-            const NM3_TO_LMIN = 1000 / 60;
+    <!-- 左右双栏：始终横向对齐 -->
+    <div class="two-col">
+        <!-- ========== 左栏：自产纯化 ========== -->
+        <div class="col">
+            <div class="col-title"><span class="tag green">自产纯化</span> 参数配置</div>
 
-            // DOM
-            const totalFlowEl = document.getElementById('totalFlow');
-            const outPressureEl = document.getElementById('outPressure');
-            const targetConcEl = document.getElementById('targetConc');
-            const targetBadge = document.getElementById('targetBadge');
-            const scenarioTag = document.getElementById('scenarioTag');
-            const gasAEl = document.getElementById('gasA');
-            const gasBEl = document.getElementById('gasB');
-            const gasABadge = document.getElementById('gasABadge');
-            const gasBBadge = document.getElementById('gasBBadge');
-            const gasNote = document.getElementById('gasNote');
-            const noteContainer = document.getElementById('noteContainer');
-            const targetHint = document.getElementById('targetHint');
-            const verifyBox = document.getElementById('verifyBox');
-            const formulaBox = document.getElementById('formulaBox');
-            const resultArea = document.getElementById('resultArea');
-            const calcBtn = document.getElementById('calcBtn');
-            const sameGasWarning = document.getElementById('sameGasWarning');
-            const frontPressureEl = document.getElementById('frontPressure');
-            const systemPressureDropEl = document.getElementById('systemPressureDrop');
-            const pressureModeRadios = document.querySelectorAll('input[name="pressureMode"]');
-            const pressureHintEl = document.getElementById('pressureHint');
-            const pressureDetailBadge = document.getElementById('pressureDetailBadge');
+            <div class="param-group">
+                <h4>🧊 原液 &amp; 充装 <span class="gas-note" id="liquidNote">液态氩</span></h4>
+                <div class="param-row">
+                    <label id="liquidPriceLabel">液态氩单价</label>
+                    <input type="number" id="liquidPrice" step="10" value="1200" min="0">
+                    <span class="unit">元/吨</span>
+                </div>
+                <div class="param-row">
+                    <label>充装压力</label>
+                    <input type="range" id="pressureSlider" min="13.5" max="15" step="0.1" value="14.5" style="flex:1;">
+                    <input type="number" id="pressureInput" step="0.1" value="14.5" min="13.5" max="15" style="max-width:60px;">
+                    <span class="unit">MPa</span>
+                </div>
+                <div class="param-row">
+                    <label id="kgLabel">每瓶耗液量</label>
+                    <input type="number" id="kgPerBottle" step="0.1" value="18.5" min="0">
+                    <span class="unit">kg</span>
+                </div>
+                <div class="param-row">
+                    <label>充装费</label>
+                    <input type="number" id="fillCost" step="0.5" value="10" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+                <div class="param-row">
+                    <label>气瓶使用费</label>
+                    <input type="number" id="cylinderCost" step="0.5" value="8" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+            </div>
 
-            // 底部折叠
-            const footerToggle = document.getElementById('footerToggle');
-            const exampleList = document.getElementById('exampleList');
-            const arrowIcon = document.getElementById('arrowIcon');
-            let examplesOpen = false;
+            <div class="param-group">
+                <h4>📈 市场 &amp; 销量</h4>
+                <div class="param-row">
+                    <label id="highPriceLabel">高纯气售价</label>
+                    <input type="number" id="priceHigh" step="1" value="150" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+                <div class="param-row">
+                    <label>设备售价</label>
+                    <input type="number" id="equipCost" step="500" value="82000" min="0">
+                    <span class="unit">元</span>
+                </div>
+                <div class="param-row">
+                    <label>当前月销量</label>
+                    <input type="number" id="monthlySales" step="1" value="200" min="1">
+                    <span class="unit">瓶</span>
+                </div>
+                <div class="param-row">
+                    <label>初始月增长率</label>
+                    <input type="number" id="growthRate" step="0.1" value="10" min="0">
+                    <span class="unit">%</span>
+                </div>
+                <div class="param-row">
+                    <label>增速衰减率</label>
+                    <input type="number" id="decayRate" step="0.1" value="1.5" min="0" max="10">
+                    <span class="unit">%/月</span>
+                </div>
+            </div>
 
-            footerToggle.addEventListener('click', function() {
-                examplesOpen = !examplesOpen;
-                exampleList.classList.toggle('open', examplesOpen);
-                arrowIcon.classList.toggle('open', examplesOpen);
-            });
+            <div class="param-group">
+                <h4>♻️ 再生耗气</h4>
+                <div class="param-row">
+                    <label>每充装再生</label>
+                    <input type="number" id="regInterval" step="100" value="12000" min="1">
+                    <span class="unit">瓶</span>
+                </div>
+                <div class="param-row">
+                    <label id="regArLabel">每次耗 原料气</label>
+                    <input type="number" id="regGas" step="0.5" value="3" min="0">
+                    <span class="unit">瓶</span>
+                </div>
+                <div class="param-row">
+                    <label>每次耗 H₂</label>
+                    <input type="number" id="regH2" step="0.5" value="2" min="0">
+                    <span class="unit">瓶</span>
+                </div>
+                <div class="param-row">
+                    <label>氢气单价</label>
+                    <input type="number" id="priceH2" step="1" value="50" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+                <span class="hint" id="regenHint">♻️ 再生耗 氩 按自产瓶装成本计</span>
+            </div>
+        </div>
 
-            let isSameGas = false;
+        <!-- ========== 右栏：外购模式 ========== -->
+        <div class="col">
+            <div class="col-title"><span class="tag orange">外购模式</span> 参数配置</div>
 
-            function getScenario(aKey, bKey) {
-                const a = gasMap[aKey];
-                const b = gasMap[bKey];
-                if (aKey === bKey) {
-                    return {
-                        type: 'ERROR',
-                        label: '❌ 错误',
-                        badge: 'error',
-                        tag: '无效',
-                        tagClass: 'error',
-                        formula: '—',
-                        note: '⚠️ A和B不能相同！'
-                    };
-                }
-                if (a.isAir) {
-                    return {
-                        type: 'O2',
-                        label: '氧含量',
-                        badge: 'o2',
-                        tag: '含氧',
-                        tagClass: 'active',
-                        formula: `空气 = 流量 × (目标% ÷ ${(O2_IN_AIR*100).toFixed(2)}%)`,
-                        note: `💡 ${a.name}+${b.name} → 氧含量 (含氧${(O2_IN_AIR*100).toFixed(2)}%)`
-                    };
-                }
-                if (a.isH2) {
-                    return {
-                        type: 'H2',
-                        label: '氢含量',
-                        badge: 'h2',
-                        tag: '含氢',
-                        tagClass: 'active',
-                        formula: `氢气 = 流量 × (目标% ÷ 100)`,
-                        note: `💡 ${a.name}+${b.name} → 氢含量`
-                    };
-                }
-                if (b.isAir) {
-                    return {
-                        type: 'VOL_AIR',
-                        label: `${a.name}体积分`,
-                        badge: 'vol',
-                        tag: '惰+空气',
-                        tagClass: '',
-                        formula: `${a.name} = 流量 × (目标% ÷ 100)`,
-                        note: `💡 ${a.name}+${b.name} → ${a.name}浓度，空气带入氧`
-                    };
-                }
-                return {
-                    type: 'INERT',
-                    label: `${a.name}体积分`,
-                    badge: 'inert',
-                    tag: '惰性',
-                    tagClass: '',
-                    formula: `${a.name} = 流量 × (目标% ÷ 100)`,
-                    note: `💡 ${a.name}+${b.name} → ${a.name}体积分数`
-                };
+            <div class="param-group">
+                <h4>🚚 采购 &amp; 运输</h4>
+                <div class="mode-switch-row">
+                    <label>采购方式</label>
+                    <select id="purchaseMode">
+                        <option value="gas">外购高纯气 (瓶)</option>
+                        <option value="liquid">外购高纯液 (吨)</option>
+                    </select>
+                </div>
+                <div class="param-row" id="rowPurchaseGas">
+                    <label id="purchaseGasLabel">外购高纯气价</label>
+                    <input type="number" id="purchaseGasPrice" step="1" value="130" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+                <div class="param-row" id="rowPurchaseLiquid" style="display:none;">
+                    <label id="purchaseLiquidLabel">外购高纯液价</label>
+                    <input type="number" id="purchaseLiquidPrice" step="10" value="2000" min="0">
+                    <span class="unit">元/吨</span>
+                </div>
+                <div class="param-row">
+                    <label>运输费</label>
+                    <input type="number" id="transportCost" step="0.5" value="5" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+                <div class="param-row">
+                    <label>杂费 (检测/管理)</label>
+                    <input type="number" id="miscCost" step="0.5" value="2" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+                <span class="hint">外购成本 = 采购价 + 运输 + 杂费</span>
+            </div>
+
+            <!-- 品质风险参数 -->
+            <div class="param-group" style="border-left: 3px solid #f5a623; padding-left: 12px;">
+                <h4>⚠️ 品质风险 <span class="risk-warning">流转环节多 · 纯度隐患</span></h4>
+                <div class="param-row">
+                    <label>品质不合格率</label>
+                    <input type="number" id="qualityFailRate" step="0.5" value="5" min="0" max="30">
+                    <span class="unit">%</span>
+                </div>
+                <div class="param-row">
+                    <label>不合格品折价损失</label>
+                    <input type="number" id="qualityLossPerBottle" step="1" value="40" min="0">
+                    <span class="unit">元/瓶</span>
+                </div>
+                <div style="font-size:12px; color:#7a5d1a; background:#fef3d0; border-radius:30px; padding:4px 16px; display:inline-block;">
+                    ⚡ 不合格品按折价出售或退货，利润直接受损
+                </div>
+            </div>
+
+            <!-- 无参数区域 -->
+            <div class="param-group">
+                <h4>⏳ 无参数区域</h4>
+                <div class="empty-placeholder">— 外购模式无设备投资，无再生耗气 —</div>
+                <div class="empty-placeholder" style="border-bottom: none; margin-bottom: 0;">— 销量及售价与左栏共享 —</div>
+            </div>
+
+            <!-- 共享参数 -->
+            <div class="param-group" style="margin-top: 12px;">
+                <h4>📊 共享参数 (来自左栏)</h4>
+                <div class="shared-param-row">
+                    <label>当前月销量</label>
+                    <span id="sharedSalesDisplay">200 瓶</span>
+                </div>
+                <div class="shared-param-row">
+                    <label id="sharedPriceLabel">高纯气售价</label>
+                    <span id="sharedPriceDisplay">150 元/瓶</span>
+                </div>
+                <div class="info-box">
+                    📌 外购模式无设备投资，无回本周期
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 结果对比 ===== -->
+    <div class="results">
+        <h2>📊 双模式对比结果 <span id="resultGasTag" class="gas-tag ar">氩气</span></h2>
+        <div class="result-grid">
+            <!-- 模式A：自产纯化 -->
+            <div class="result-block">
+                <div class="block-title"><span class="tag green">自产纯化</span> 模式A</div>
+                <div class="result-item"><span class="label">瓶装气成本</span><span class="value" id="rA_bottleCost">—</span></div>
+                <div class="result-item"><span class="label">单瓶毛利</span><span class="value" id="rA_margin">—</span></div>
+                <div class="result-item"><span class="label">单瓶再生成本</span><span class="value" id="rA_regenCost">—</span></div>
+                <div class="result-item"><span class="label">单瓶净利润</span><span class="value green" id="rA_net">—</span></div>
+                <div class="result-item"><span class="label">首月净利润</span><span class="value" id="rA_firstMonth">—</span></div>
+                <div class="result-item"><span class="label">回本周期</span><span class="value blue" id="rA_payback">—</span></div>
+                <div class="result-item"><span class="label">首年净利润</span><span class="value green" id="rA_year1">—</span></div>
+                <div class="result-item"><span class="label">年化收益率</span><span class="value blue" id="rA_roi">—</span></div>
+                <div class="result-item"><span class="label">10年总利润</span><span class="value green" id="rA_total10">—</span></div>
+            </div>
+
+            <!-- 模式B：外购 -->
+            <div class="result-block">
+                <div class="block-title"><span class="tag orange">外购模式</span> 模式B</div>
+                <div class="result-item"><span class="label">外购成本 (到厂)</span><span class="value orange" id="rB_purchaseCost">—</span></div>
+                <div class="result-item"><span class="label">单瓶毛利 (未计品质)</span><span class="value" id="rB_marginRaw">—</span></div>
+                <div class="result-item"><span class="label">品质不合格率</span><span class="value red" id="rB_failRate">—</span></div>
+                <div class="result-item"><span class="label">单瓶品质损失</span><span class="value red" id="rB_qualityLoss">—</span></div>
+                <div class="result-item"><span class="label">单瓶净利润 (含品质)</span><span class="value orange" id="rB_net">—</span></div>
+                <div class="result-item"><span class="label">首月净利润 (含品质)</span><span class="value" id="rB_firstMonth">—</span></div>
+                <div class="result-item"><span class="label">首年净利润 (含品质)</span><span class="value orange" id="rB_year1">—</span></div>
+                <div class="result-item"><span class="label">10年总利润 (含品质)</span><span class="value orange" id="rB_total10">—</span></div>
+                <div class="vs-row">
+                    <span class="label">⚖️ 自产 vs 外购 (年利润差)</span>
+                    <span class="value" id="rB_vsDiff" style="font-weight:700;">—</span>
+                </div>
+                <div style="margin-top:8px; font-size:12px; color:#7a5d1a; background:#fef3d0; border-radius:30px; padding:4px 16px; text-align:center;">
+                    ⚠️ 品质风险已计入外购模式净利润
+                </div>
+            </div>
+        </div>
+        <div class="footnote">
+            <span id="footnoteText">🔄 销量增速衰减 · 外购模式含品质不合格率及折价损失</span>
+            <button class="btn-reset" id="resetDefaultBtn">↺ 恢复默认</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- DOM 元素 -----
+        const gasTypeSelect = document.getElementById('gasTypeSelect');
+        const gasNameDisplay = document.getElementById('gasNameDisplay');
+        const resultGasTag = document.getElementById('resultGasTag');
+
+        // 左栏
+        const liquidPrice = document.getElementById('liquidPrice');
+        const liquidPriceLabel = document.getElementById('liquidPriceLabel');
+        const pressureSlider = document.getElementById('pressureSlider');
+        const pressureInput = document.getElementById('pressureInput');
+        const kgPerBottle = document.getElementById('kgPerBottle');
+        const kgLabel = document.getElementById('kgLabel');
+        const fillCost = document.getElementById('fillCost');
+        const cylinderCost = document.getElementById('cylinderCost');
+        const priceHigh = document.getElementById('priceHigh');
+        const highPriceLabel = document.getElementById('highPriceLabel');
+        const equipCost = document.getElementById('equipCost');
+        const monthlySales = document.getElementById('monthlySales');
+        const growthRate = document.getElementById('growthRate');
+        const decayRate = document.getElementById('decayRate');
+        const regInterval = document.getElementById('regInterval');
+        const regGas = document.getElementById('regGas');
+        const regArLabel = document.getElementById('regArLabel');
+        const regH2 = document.getElementById('regH2');
+        const priceH2 = document.getElementById('priceH2');
+        const regenHint = document.getElementById('regenHint');
+        const liquidNote = document.getElementById('liquidNote');
+
+        // 右栏
+        const purchaseMode = document.getElementById('purchaseMode');
+        const purchaseGasPrice = document.getElementById('purchaseGasPrice');
+        const purchaseLiquidPrice = document.getElementById('purchaseLiquidPrice');
+        const purchaseGasLabel = document.getElementById('purchaseGasLabel');
+        const purchaseLiquidLabel = document.getElementById('purchaseLiquidLabel');
+        const transportCost = document.getElementById('transportCost');
+        const miscCost = document.getElementById('miscCost');
+        const qualityFailRate = document.getElementById('qualityFailRate');
+        const qualityLossPerBottle = document.getElementById('qualityLossPerBottle');
+        const rowGas = document.getElementById('rowPurchaseGas');
+        const rowLiquid = document.getElementById('rowPurchaseLiquid');
+        const sharedSalesDisplay = document.getElementById('sharedSalesDisplay');
+        const sharedPriceDisplay = document.getElementById('sharedPriceDisplay');
+        const sharedPriceLabel = document.getElementById('sharedPriceLabel');
+
+        // 结果 A
+        const rA_bottleCost = document.getElementById('rA_bottleCost');
+        const rA_margin = document.getElementById('rA_margin');
+        const rA_regenCost = document.getElementById('rA_regenCost');
+        const rA_net = document.getElementById('rA_net');
+        const rA_firstMonth = document.getElementById('rA_firstMonth');
+        const rA_payback = document.getElementById('rA_payback');
+        const rA_year1 = document.getElementById('rA_year1');
+        const rA_roi = document.getElementById('rA_roi');
+        const rA_total10 = document.getElementById('rA_total10');
+
+        // 结果 B
+        const rB_purchaseCost = document.getElementById('rB_purchaseCost');
+        const rB_marginRaw = document.getElementById('rB_marginRaw');
+        const rB_failRate = document.getElementById('rB_failRate');
+        const rB_qualityLoss = document.getElementById('rB_qualityLoss');
+        const rB_net = document.getElementById('rB_net');
+        const rB_firstMonth = document.getElementById('rB_firstMonth');
+        const rB_year1 = document.getElementById('rB_year1');
+        const rB_total10 = document.getElementById('rB_total10');
+        const rB_vsDiff = document.getElementById('rB_vsDiff');
+
+        const footnoteText = document.getElementById('footnoteText');
+
+        // ----- 气体配置 -----
+        const GAS_CONFIG = {
+            ar: {
+                name: '氩',
+                nameFull: '氩气',
+                liquidLabel: '液态氩单价',
+                kgLabel: '每瓶耗液氩',
+                highPriceLabel: '高纯氩售价',
+                purchaseGasLabel: '外购高纯氩气价',
+                purchaseLiquidLabel: '外购高纯液氩价',
+                regGasLabel: '每次耗 氩',
+                regenHint: '♻️ 再生耗氩按自产瓶装成本计',
+                liquidNote: '液态氩',
+                kgDefault: 18.5,
+                liquidDefault: 1200,
+                highPriceDefault: 150,
+                purchaseGasDefault: 130,
+                purchaseLiquidDefault: 2000,
+                tagClass: 'ar',
+                tagText: '氩气'
+            },
+            n2: {
+                name: '氮',
+                nameFull: '氮气',
+                liquidLabel: '液态氮单价',
+                kgLabel: '每瓶耗液氮',
+                highPriceLabel: '高纯氮售价',
+                purchaseGasLabel: '外购高纯氮气价',
+                purchaseLiquidLabel: '外购高纯液氮价',
+                regGasLabel: '每次耗 氮',
+                regenHint: '♻️ 再生耗氮按自产瓶装成本计',
+                liquidNote: '液态氮',
+                kgDefault: 16.5,
+                liquidDefault: 800,
+                highPriceDefault: 120,
+                purchaseGasDefault: 100,
+                purchaseLiquidDefault: 1400,
+                tagClass: 'n2',
+                tagText: '氮气'
             }
+        };
 
-            function checkSameGas() {
-                const aKey = gasAEl.value;
-                const bKey = gasBEl.value;
-                isSameGas = (aKey === bKey);
-                if (isSameGas) {
-                    gasAEl.classList.add('error');
-                    gasBEl.classList.add('error');
-                    sameGasWarning.textContent = '⚠️ A≠B';
-                } else {
-                    gasAEl.classList.remove('error');
-                    gasBEl.classList.remove('error');
-                    sameGasWarning.textContent = '';
-                }
-                return isSameGas;
+        let currentGas = 'ar';
+
+        // ----- 切换气体 -----
+        function switchGas(gasType) {
+            currentGas = gasType;
+            const config = GAS_CONFIG[gasType];
+
+            // 更新标签
+            gasNameDisplay.textContent = config.name;
+            liquidPriceLabel.textContent = config.liquidLabel;
+            kgLabel.textContent = config.kgLabel;
+            highPriceLabel.textContent = config.highPriceLabel;
+            purchaseGasLabel.textContent = config.purchaseGasLabel;
+            purchaseLiquidLabel.textContent = config.purchaseLiquidLabel;
+            regArLabel.textContent = config.regGasLabel;
+            regenHint.textContent = config.regenHint;
+            liquidNote.textContent = config.liquidNote;
+            sharedPriceLabel.textContent = config.highPriceLabel;
+
+            // 更新结果标题
+            resultGasTag.textContent = config.tagText;
+            resultGasTag.className = 'gas-tag ' + config.tagClass;
+
+            // 更新默认值（如果用户没修改过）
+            // 这里只做切换时自动填入默认值，但保留用户手动修改的值
+            // 我们仅在切换时重置为默认值，方便对比
+            liquidPrice.value = config.liquidDefault;
+            kgPerBottle.value = config.kgDefault;
+            priceHigh.value = config.highPriceDefault;
+            purchaseGasPrice.value = config.purchaseGasDefault;
+            purchaseLiquidPrice.value = config.purchaseLiquidDefault;
+
+            // 触发重新计算
+            calculate();
+        }
+
+        // ----- 气体切换事件 -----
+        gasTypeSelect.addEventListener('change', function() {
+            switchGas(this.value);
+        });
+
+        // ----- pressure sync -----
+        function calcKgFromPressure(mpa) {
+            // 不同气体密度不同，但这里保留线性关系
+            const basePressure = 15;
+            const baseKg = parseFloat(kgPerBottle.value) || 18.5;
+            // 用户可手动调整kgPerBottle，压力只做联动微调
+            // 但我们用当前kg作为基准，按压力比例调整
+            const currentKg = parseFloat(kgPerBottle.value) || 18.5;
+            let kg = (mpa / basePressure) * currentKg;
+            // 但为了更合理，用气体专属基准
+            const config = GAS_CONFIG[currentGas];
+            const defaultKg = config ? config.kgDefault : 18.5;
+            kg = (mpa / basePressure) * defaultKg;
+            return Math.round(kg * 100) / 100;
+        }
+
+        function syncPressure(value) {
+            let v = parseFloat(value);
+            if (isNaN(v)) v = 14.5;
+            v = Math.min(15, Math.max(13.5, v));
+            pressureSlider.value = v;
+            pressureInput.value = v;
+            const config = GAS_CONFIG[currentGas];
+            const baseKg = config ? config.kgDefault : 18.5;
+            const newKg = Math.round(((v / 15) * baseKg) * 100) / 100;
+            kgPerBottle.value = newKg;
+            calculate();
+        }
+
+        pressureSlider.addEventListener('input', function() { syncPressure(this.value); });
+        pressureInput.addEventListener('change', function() {
+            let v = parseFloat(this.value);
+            if (isNaN(v)) v = 14.5;
+            v = Math.min(15, Math.max(13.5, v));
+            syncPressure(v);
+        });
+
+        // ----- purchase mode toggle -----
+        purchaseMode.addEventListener('change', function() {
+            if (this.value === 'gas') {
+                rowGas.style.display = 'flex';
+                rowLiquid.style.display = 'none';
+            } else {
+                rowGas.style.display = 'none';
+                rowLiquid.style.display = 'flex';
             }
+            calculate();
+        });
 
-            function updateUI() {
-                const aKey = gasAEl.value;
-                const bKey = gasBEl.value;
-                const a = gasMap[aKey];
-                const b = gasMap[bKey];
-                const scenario = getScenario(aKey, bKey);
-                const targetVal = parseFloat(targetConcEl.value) || 0;
-                const totalFlow = parseFloat(totalFlowEl.value) || 0;
+        // ----- 更新共享显示 -----
+        function updateSharedDisplay() {
+            const s = parseFloat(monthlySales.value) || 0;
+            const p = parseFloat(priceHigh.value) || 0;
+            sharedSalesDisplay.textContent = s + ' 瓶';
+            sharedPriceDisplay.textContent = p + ' 元/瓶';
+        }
 
-                gasABadge.textContent = a.property;
-                gasABadge.className = `gas-tag ${a.badge}`;
-                gasBBadge.textContent = b.property;
-                gasBBadge.className = `gas-tag ${b.badge}`;
+        // ----- 核心计算 -----
+        function calculate() {
+            // ---- 读取参数 ----
+            const lAr = parseFloat(liquidPrice.value) || 0;
+            const kg = parseFloat(kgPerBottle.value) || 0;
+            const fill = parseFloat(fillCost.value) || 0;
+            const cyl = parseFloat(cylinderCost.value) || 0;
+            const pHigh = parseFloat(priceHigh.value) || 0;
+            const equip = parseFloat(equipCost.value) || 0;
+            const sales0 = parseFloat(monthlySales.value) || 0;
+            const g0 = parseFloat(growthRate.value) || 0;
+            const decay = parseFloat(decayRate.value) || 0;
+            const interval = parseFloat(regInterval.value) || 1;
+            const rGas = parseFloat(regGas.value) || 0;
+            const rH2 = parseFloat(regH2.value) || 0;
+            const pH2 = parseFloat(priceH2.value) || 0;
 
-                const same = checkSameGas();
+            const mode = purchaseMode.value;
+            const pGas = parseFloat(purchaseGasPrice.value) || 0;
+            const pLiquid = parseFloat(purchaseLiquidPrice.value) || 0;
+            const transport = parseFloat(transportCost.value) || 0;
+            const misc = parseFloat(miscCost.value) || 0;
+            const failRate = parseFloat(qualityFailRate.value) || 0;
+            const lossPerBottle = parseFloat(qualityLossPerBottle.value) || 0;
 
-                targetBadge.textContent = scenario.label;
-                targetBadge.className = `target-badge ${scenario.badge}`;
-                scenarioTag.textContent = scenario.tag;
-                scenarioTag.className = `scenario-tag ${scenario.tagClass}`;
+            // ============================================================
+            // 模式A: 自产纯化
+            // ============================================================
+            const liquidCostPerBottle = (lAr * kg) / 1000;
+            const bottleCost = liquidCostPerBottle + fill + cyl;
+            const marginA = pHigh - bottleCost;
+            const regGasCost = rGas * bottleCost;
+            const regH2Cost = rH2 * pH2;
+            const regCostPerTime = regGasCost + regH2Cost;
+            const regCostPerBottle = interval > 0 ? regCostPerTime / interval : 0;
+            const netA = marginA - regCostPerBottle;
 
-                if (same) {
-                    noteContainer.innerHTML =
-                        `<div class="note-box error">⚠️ A和B不能为同一种气体！</div>`;
-                    targetHint.textContent = '⚠️ 请选择不同气体';
-                    verifyBox.className = 'verify-box hidden';
-                    formulaBox.className = 'formula-box hidden';
-                    resultArea.classList.add('disabled');
-                    calcBtn.disabled = true;
-                    return;
-                }
-
-                resultArea.classList.remove('disabled');
-                calcBtn.disabled = false;
-
-                noteContainer.innerHTML =
-                    `<div class="note-box ${scenario.type === 'O2' ? 'default' : scenario.type === 'H2' ? 'default' : scenario.type === 'VOL_AIR' ? 'info' : 'inert'}">${scenario.note}</div>`;
-
-                verifyBox.className = 'verify-box';
-                formulaBox.className = 'formula-box';
-
-                let verifyText = '';
-                let formulaLabel = scenario.formula;
-                let formulaCalc = '';
-                let verifyClass = 'verify-box';
-
-                if (scenario.type === 'O2') {
-                    targetHint.textContent = `空气→氧含量`;
-                    if (targetVal > 0 && targetVal <= O2_IN_AIR * 100) {
-                        const ratio = (targetVal / 100 / O2_IN_AIR * 100);
-                        verifyText =
-                            `✅ ${targetVal}% → 空气占 ${ratio.toFixed(2)}%`;
-                        verifyClass = 'verify-box success';
-                        formulaCalc =
-                            `${totalFlow} × (${targetVal}÷${(O2_IN_AIR*100).toFixed(2)}) = ${(totalFlow * targetVal / (O2_IN_AIR*100)).toFixed(2)} Nm³/h`;
-                    } else if (targetVal > O2_IN_AIR * 100) {
-                        verifyText = `⚠️ ${targetVal}% 超过空气氧含量 ${(O2_IN_AIR*100).toFixed(2)}%`;
-                        verifyClass = 'verify-box warning';
-                        formulaCalc = '⚠️ 超出上限';
-                    } else {
-                        verifyText = `请输入 0~${(O2_IN_AIR*100).toFixed(2)}`;
-                        verifyClass = 'verify-box info';
-                        formulaCalc = '等待输入';
+            // 销量曲线 (衰减)
+            function calcSales(months) {
+                let s = sales0;
+                let g = g0 / 100;
+                const d = decay / 100;
+                const result = [];
+                for (let m = 0; m < months; m++) {
+                    if (m > 0) {
+                        g = Math.max(0, g - d);
+                        s = s * (1 + g);
                     }
-                } else if (scenario.type === 'H2') {
-                    targetHint.textContent = `氢气→氢含量`;
-                    verifyText = `✅ ${targetVal}% → 氢气占 ${targetVal}%`;
-                    verifyClass = 'verify-box success';
-                    formulaCalc = `${totalFlow} × (${targetVal}÷100) = ${(totalFlow * targetVal / 100).toFixed(2)} Nm³/h`;
-                } else if (scenario.type === 'VOL_AIR') {
-                    targetHint.textContent = `${a.name}→体积分，空气带入氧`;
-                    const airFlow = totalFlow * (1 - targetVal / 100);
-                    const actualO2 = (airFlow * O2_IN_AIR / totalFlow) * 100;
-                    verifyText =
-                        `✅ ${targetVal}% → ${a.name}占 ${targetVal}% (空气带氧 ${actualO2.toFixed(2)}%)`;
-                    verifyClass = 'verify-box info';
-                    formulaCalc =
-                        `${totalFlow} × (${targetVal}÷100) = ${(totalFlow * targetVal / 100).toFixed(2)} Nm³/h`;
-                } else {
-                    targetHint.textContent = `${a.name}→体积分`;
-                    verifyText = `✅ ${targetVal}% → ${a.name}占 ${targetVal}%`;
-                    verifyClass = 'verify-box inert';
-                    formulaCalc =
-                        `${totalFlow} × (${targetVal}÷100) = ${(totalFlow * targetVal / 100).toFixed(2)} Nm³/h`;
+                    result.push(s);
                 }
-
-                verifyBox.textContent = verifyText;
-                verifyBox.className = verifyClass;
-
-                formulaBox.innerHTML = `
-                        <div class="row"><span class="label-cell">公式</span><span class="value-cell">${formulaLabel}</span></div>
-                        <div class="row"><span class="label-cell">计算</span><span class="value-cell">${formulaCalc}</span></div>
-                    `;
+                return result;
             }
 
-            // 事件绑定
-            gasAEl.addEventListener('change', function() { checkSameGas();
-                updateUI();
-                scheduleCalculate(); });
-            gasBEl.addEventListener('change', function() { checkSameGas();
-                updateUI();
-                scheduleCalculate(); });
-            targetConcEl.addEventListener('input', updateUI);
-            totalFlowEl.addEventListener('input', updateUI);
-            outPressureEl.addEventListener('input', function() {
-                if (document.querySelector('input[name="pressureMode"]:checked').value !== 'manual') {
-                    updateAutoPressure();
+            const sales120 = calcSales(120);
+            const sales12 = sales120.slice(0, 12);
+
+            // 回本
+            let payback = Infinity;
+            if (equip > 0 && netA > 0 && sales0 > 0) {
+                let cum = 0;
+                for (let m = 0; m < 120; m++) {
+                    cum += sales120[m] * netA;
+                    if (cum >= equip) { payback = m + 1; break; }
                 }
-                updatePressureHint();
-            });
-
-            pressureModeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const isManual = this.value === 'manual';
-                    frontPressureEl.disabled = !isManual;
-                    frontPressureEl.style.background = isManual ? '#ffffff' : '#f1f5f9';
-                    systemPressureDropEl.disabled = isManual;
-                    systemPressureDropEl.style.background = isManual ? '#f1f5f9' : '#ffffff';
-                    if (!isManual) updateAutoPressure();
-                    updatePressureHint();
-                    scheduleCalculate();
-                });
-            });
-
-            function updateAutoPressure() {
-                const outP = parseFloat(outPressureEl.value) || 0.15;
-                const drop = parseFloat(systemPressureDropEl.value) || 0.08;
-                frontPressureEl.value = Math.round((outP + drop) * 1000) / 1000;
-                updatePressureDetail();
+                if (payback === Infinity) payback = 120;
+            } else {
+                payback = equip > 0 ? Infinity : 0;
             }
 
-            function updatePressureHint() {
-                const isManual = document.querySelector('input[name="pressureMode"]:checked').value === 'manual';
-                const outP = parseFloat(outPressureEl.value) || 0.15;
-                const frontP = parseFloat(frontPressureEl.value) || 0;
-                const drop = parseFloat(systemPressureDropEl.value) || 0.08;
+            const firstProfitA = sales0 * netA;
+            const year1ProfitA = sales12.reduce((sum, s) => sum + s * netA, 0);
+            const total10ProfitA = sales120.reduce((sum, s) => sum + s * netA, 0);
+            const roiA = equip > 0 ? (year1ProfitA / equip) * 100 : 0;
 
-                if (isManual) {
-                    if (frontP < outP + 0.005) {
-                        pressureHintEl.textContent = `⚠️ 前端 ${frontP.toFixed(3)} > 出口 ${outP.toFixed(3)}`;
-                        pressureHintEl.style.color = '#b3413d';
-                    } else {
-                        pressureHintEl.textContent =
-                            `手动：前端 ${frontP.toFixed(3)} · 压差 ${(frontP - outP).toFixed(3)}`;
-                        pressureHintEl.style.color = '#4a6f8e';
-                    }
-                } else {
-                    pressureHintEl.textContent =
-                        `自动：前端 = ${outP.toFixed(2)} + ${drop.toFixed(3)} = ${(outP + drop).toFixed(3)} MPa`;
-                    pressureHintEl.style.color = '#4a6f8e';
-                }
-                updatePressureDetail();
+            // ============================================================
+            // 模式B: 外购 (含品质风险)
+            // ============================================================
+            let purchaseCostPerBottle = 0;
+            if (mode === 'gas') {
+                purchaseCostPerBottle = pGas + transport + misc;
+            } else {
+                const liquidCostB = (pLiquid * kg) / 1000;
+                purchaseCostPerBottle = liquidCostB + fill + transport + misc;
+            }
+            const marginRaw = pHigh - purchaseCostPerBottle;
+
+            const avgQualityLoss = (failRate / 100) * lossPerBottle;
+            const netB = marginRaw - avgQualityLoss;
+
+            const firstProfitB = sales0 * netB;
+            const year1ProfitB = sales12.reduce((sum, s) => sum + s * netB, 0);
+            const total10ProfitB = sales120.reduce((sum, s) => sum + s * netB, 0);
+
+            const diffYear1 = year1ProfitA - year1ProfitB;
+
+            // ============================================================
+            // 渲染
+            // ============================================================
+            function fmt(v) {
+                if (v === undefined || isNaN(v)) return '—';
+                if (Math.abs(v) >= 1e8) return (v / 1e8).toFixed(2) + '亿';
+                if (Math.abs(v) >= 1e4) return (v / 1e4).toFixed(2) + '万';
+                return v.toFixed(2);
             }
 
-            function updatePressureDetail() {
-                const outP = parseFloat(outPressureEl.value) || 0.15;
-                const frontP = parseFloat(frontPressureEl.value) || 0;
-                pressureDetailBadge.textContent = `压差 ${(frontP - outP).toFixed(3)}`;
-            }
+            // A
+            rA_bottleCost.textContent = fmt(bottleCost) + ' 元';
+            rA_margin.textContent = fmt(marginA) + ' 元';
+            rA_regenCost.textContent = fmt(regCostPerBottle) + ' 元';
+            rA_net.textContent = fmt(netA) + ' 元';
+            rA_firstMonth.textContent = fmt(firstProfitA) + ' 元';
+            rA_payback.textContent = (payback === Infinity) ? '>120个月' : (payback === 0 ? '0 (免费)' : payback.toFixed(1) + ' 个月');
+            rA_year1.textContent = fmt(year1ProfitA) + ' 元';
+            rA_roi.textContent = roiA.toFixed(1) + ' %';
+            rA_total10.textContent = fmt(total10ProfitA) + ' 元';
 
-            systemPressureDropEl.addEventListener('input', function() {
-                if (document.querySelector('input[name="pressureMode"]:checked').value !== 'manual') {
-                    updateAutoPressure();
-                    updatePressureHint();
-                }
-                updatePressureDetail();
-            });
+            // B
+            rB_purchaseCost.textContent = fmt(purchaseCostPerBottle) + ' 元';
+            rB_marginRaw.textContent = fmt(marginRaw) + ' 元';
+            rB_failRate.textContent = failRate.toFixed(1) + ' %';
+            rB_qualityLoss.textContent = fmt(avgQualityLoss) + ' 元/瓶';
+            rB_net.textContent = fmt(netB) + ' 元';
+            rB_firstMonth.textContent = fmt(firstProfitB) + ' 元';
+            rB_year1.textContent = fmt(year1ProfitB) + ' 元';
+            rB_total10.textContent = fmt(total10ProfitB) + ' 元';
+            rB_vsDiff.textContent = (diffYear1 >= 0 ? '自产多赚 ' : '外购多赚 ') + fmt(Math.abs(diffYear1)) + ' 元/年';
+            rB_vsDiff.style.color = diffYear1 >= 0 ? '#1a7a4e' : '#b86b1a';
 
-            frontPressureEl.addEventListener('input', function() {
-                if (this.disabled) return;
-                updatePressureDetail();
-                const val = parseFloat(this.value) || 0;
-                const outP = parseFloat(outPressureEl.value) || 0;
-                if (val < outP + 0.005) {
-                    pressureHintEl.textContent = `⚠️ 前端 ${val.toFixed(3)} > 出口 ${outP.toFixed(3)}`;
-                    pressureHintEl.style.color = '#b3413d';
-                } else {
-                    pressureHintEl.textContent = `手动：前端 ${val.toFixed(3)} · 压差 ${(val - outP).toFixed(3)}`;
-                    pressureHintEl.style.color = '#4a6f8e';
-                }
-            });
+            updateSharedDisplay();
 
-            let timeoutId;
+            // 更新脚注
+            const config = GAS_CONFIG[currentGas];
+            footnoteText.textContent = '🔄 销量增速衰减 · 外购模式含品质不合格率及折价损失 · 当前气体: ' + config.nameFull;
+        }
 
-            function scheduleCalculate() {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(calculate, 200);
-            }
+        // ----- 重置 -----
+        document.getElementById('resetDefaultBtn').addEventListener('click', function() {
+            const config = GAS_CONFIG[currentGas];
+            liquidPrice.value = config.liquidDefault;
+            kgPerBottle.value = config.kgDefault;
+            priceHigh.value = config.highPriceDefault;
+            purchaseGasPrice.value = config.purchaseGasDefault;
+            purchaseLiquidPrice.value = config.purchaseLiquidDefault;
+            fillCost.value = 10;
+            cylinderCost.value = 8;
+            equipCost.value = 82000;
+            monthlySales.value = 200;
+            growthRate.value = 10;
+            decayRate.value = 1.5;
+            regInterval.value = 12000;
+            regGas.value = 3;
+            regH2.value = 2;
+            priceH2.value = 50;
+            transportCost.value = 5;
+            miscCost.value = 2;
+            qualityFailRate.value = 5;
+            qualityLossPerBottle.value = 40;
+            purchaseMode.value = 'gas';
+            purchaseMode.dispatchEvent(new Event('change'));
+            syncPressure(14.5);
+            calculate();
+        });
 
-            // ===== 核心计算 =====
-            function calculate() {
-                const totalFlowNm3 = parseFloat(totalFlowEl.value);
-                const outPressure = parseFloat(outPressureEl.value);
-                const targetConc = parseFloat(targetConcEl.value);
-                const gasAKey = gasAEl.value;
-                const gasBKey = gasBEl.value;
+        // ----- 绑定事件 -----
+        const inputs = [liquidPrice, kgPerBottle, fillCost, cylinderCost, priceHigh, equipCost,
+                        monthlySales, growthRate, decayRate, regInterval, regGas, regH2, priceH2,
+                        purchaseGasPrice, purchaseLiquidPrice, transportCost, miscCost,
+                        qualityFailRate, qualityLossPerBottle];
+        inputs.forEach(inp => inp.addEventListener('input', calculate));
+        purchaseMode.addEventListener('change', calculate);
+        monthlySales.addEventListener('input', updateSharedDisplay);
+        priceHigh.addEventListener('input', updateSharedDisplay);
 
-                if (gasAKey === gasBKey) {
-                    document.getElementById('resultGrid').innerHTML = `
-                            <div class="error-placeholder">
-                                <span class="big">⚠️</span>
-                                <div class="main">A和B不能相同</div>
-                                <div class="sub">请选择不同气体</div>
-                            </div>
-                        `;
-                    document.getElementById('pressureDisplay').textContent = '—';
-                    document.getElementById('pressureDetail').textContent = '请选择不同气体';
-                    document.getElementById('flowSummary').textContent = '⚠️ 请选择不同气体';
-                    return;
-                }
-
-                let frontPressure = parseFloat(frontPressureEl.value);
-                const isManual = document.querySelector('input[name="pressureMode"]:checked').value === 'manual';
-                if (!isManual) { updateAutoPressure();
-                    frontPressure = parseFloat(frontPressureEl.value); }
-
-                if (isNaN(totalFlowNm3) || totalFlowNm3 <= 0) { alert('请输入有效总流量'); return; }
-                if (isNaN(outPressure) || outPressure <= 0) { alert('请输入有效出口压力'); return; }
-                if (isNaN(targetConc) || targetConc < 0 || targetConc > 100) { alert('目标浓度 0~100'); return; }
-                if (isNaN(frontPressure) || frontPressure <= 0) { alert('请输入有效前端压力'); return; }
-                if (frontPressure < outPressure) { alert(`前端压力 ${frontPressure.toFixed(3)} MPa 低于出口压力`); return; }
-
-                const gasA = gasMap[gasAKey];
-                const gasB = gasMap[gasBKey];
-                const scenario = getScenario(gasAKey, gasBKey);
-
-                let flowA_Nm3, flowB_Nm3, concA_actual, concB_actual;
-                let targetInfo = '';
-
-                if (scenario.type === 'O2') {
-                    const ratioA = (targetConc / 100) / O2_IN_AIR;
-                    if (ratioA > 1) {
-                        alert(`目标氧含量 ${targetConc}% 过高！空气中仅含 ${(O2_IN_AIR*100).toFixed(2)}% 氧`);
-                        return;
-                    }
-                    flowA_Nm3 = totalFlowNm3 * ratioA;
-                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
-                    concA_actual = (flowA_Nm3 / totalFlowNm3) * 100;
-                    concB_actual = 100 - concA_actual;
-                    targetInfo = `氧 ${targetConc}%`;
-                } else if (scenario.type === 'H2') {
-                    const ratioA = targetConc / 100;
-                    flowA_Nm3 = totalFlowNm3 * ratioA;
-                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
-                    concA_actual = ratioA * 100;
-                    concB_actual = 100 - concA_actual;
-                    targetInfo = `氢 ${targetConc}%`;
-                } else if (scenario.type === 'VOL_AIR') {
-                    const ratioA = targetConc / 100;
-                    flowA_Nm3 = totalFlowNm3 * ratioA;
-                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
-                    concA_actual = ratioA * 100;
-                    concB_actual = 100 - concA_actual;
-                    const actualO2 = (flowB_Nm3 * O2_IN_AIR / totalFlowNm3) * 100;
-                    targetInfo = `${gasA.name} ${targetConc}% (带氧 ${actualO2.toFixed(2)}%)`;
-                } else {
-                    const ratioA = targetConc / 100;
-                    flowA_Nm3 = totalFlowNm3 * ratioA;
-                    flowB_Nm3 = totalFlowNm3 - flowA_Nm3;
-                    concA_actual = ratioA * 100;
-                    concB_actual = 100 - concA_actual;
-                    targetInfo = `${gasA.name} ${targetConc}%`;
-                }
-
-                if (flowA_Nm3 < 0) flowA_Nm3 = 0;
-                if (flowB_Nm3 < 0) flowB_Nm3 = 0;
-
-                const flowA_Lmin = flowA_Nm3 * NM3_TO_LMIN;
-                const flowB_Lmin = flowB_Nm3 * NM3_TO_LMIN;
-                const totalLmin = totalFlowNm3 * NM3_TO_LMIN;
-                const pressureDiff = frontPressure - outPressure;
-
-                document.getElementById('resultGrid').innerHTML = `
-                        <div class="result-card">
-                            <div class="r-label">A · ${gasA.name}</div>
-                            <div class="r-value">${flowA_Lmin.toFixed(2)} <span class="r-unit">L/min</span></div>
-                            <div class="r-sub">${concA_actual.toFixed(1)}%</div>
-                        </div>
-                        <div class="result-card">
-                            <div class="r-label">B · ${gasB.name}</div>
-                            <div class="r-value">${flowB_Lmin.toFixed(2)} <span class="r-unit">L/min</span></div>
-                            <div class="r-sub">${concB_actual.toFixed(1)}%</div>
-                        </div>
-                        <div class="result-card">
-                            <div class="r-label">总流量</div>
-                            <div class="r-value">${totalLmin.toFixed(2)} <span class="r-unit">L/min</span></div>
-                            <div class="r-sub">${totalFlowNm3.toFixed(2)} Nm³/h</div>
-                        </div>
-                    `;
-
-                document.getElementById('pressureDisplay').textContent = `${frontPressure.toFixed(3)} MPa`;
-                document.getElementById('pressureDetail').textContent =
-                    `出口 ${outPressure.toFixed(3)} · 压差 ${pressureDiff.toFixed(3)}`;
-                document.getElementById('flowSummary').textContent =
-                    `${totalFlowNm3.toFixed(2)} Nm³/h → ${targetInfo} · 出口 ${outPressure.toFixed(3)} · 前端 ${frontPressure.toFixed(3)}`;
-
-                updateUI();
-            }
-
-            // 绑定计算按钮
-            document.getElementById('calcBtn').addEventListener('click', calculate);
-            [totalFlowEl, outPressureEl, targetConcEl, frontPressureEl, systemPressureDropEl].forEach(el => {
-                el.addEventListener('input', scheduleCalculate);
-                el.addEventListener('change', calculate);
-            });
-            pressureModeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    scheduleCalculate();
-                    setTimeout(updatePressureHint, 50);
-                });
-            });
-
-            // 初始化
-            window.addEventListener('load', function() {
-                totalFlowEl.value = '15';
-                outPressureEl.value = '0.15';
-                targetConcEl.value = '7';
-                gasAEl.value = 'air';
-                gasBEl.value = 'nitrogen';
-                systemPressureDropEl.value = '0.08';
-                document.querySelector('input[name="pressureMode"][value="auto"]').checked = true;
-                frontPressureEl.disabled = true;
-                frontPressureEl.style.background = '#f1f5f9';
-                checkSameGas();
-                updateUI();
-                updateAutoPressure();
-                updatePressureHint();
-                calculate();
-            });
-
-            window.calculate = calculate;
-        })();
-    </script>
-
+        // ----- 初始化 -----
+        // 设置默认气体为氩
+        gasTypeSelect.value = 'ar';
+        switchGas('ar');
+        syncPressure(14.5);
+        purchaseMode.value = 'gas';
+        purchaseMode.dispatchEvent(new Event('change'));
+        updateSharedDisplay();
+        calculate();
+    })();
+</script>
 </body>
 </html>
