@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瑞泽净化 - 销售工作流系统 (全量话术自由版)</title>
+<style>
+    /* 基础样式 */
+    :root {
+        --primary-color: #1e3a8a;
+        --secondary-color: #3b82f6;
+        --bg-color: #f1f5f9;
+        --text-color: #334155;
+        --card-bg: #ffffff;
+        --client-bg: #e2e8f0;
+        --sales-bg: #dbeafe;
+    }
+    body { font-family: 'Microsoft YaHei', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-color); }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1300px; margin: 0 auto 20px auto; flex-wrap: wrap; gap: 10px; }
+    .top-bar h1 { color: var(--primary-color); margin: 0; font-size: 24px; }
+    .top-input-group { display: flex; gap: 10px; align-items: center; background: #e0f2fe; padding: 8px 15px; border-radius: 8px; border: 1px solid #bae6fd; }
+    .top-input-group label { font-size: 14px; font-weight: bold; color: #0284c7; }
+    .top-input-group input { padding: 6px 10px; border-radius: 4px; border: 1px solid #7dd3fc; font-size: 14px; outline: none; width: 110px; }
+    .btn-settings { background: #1e3a8a; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;}
+    .btn-settings:hover { background: #1e40af; }
+
+    /* 主布局 */
+    .main-layout { display: flex; gap: 20px; max-width: 1300px; margin: 0 auto; align-items: flex-start;}
+    .left-panel { flex: 1.8; display: flex; flex-direction: column; gap: 20px; min-width: 0;}
+    .right-panel { flex: 1.2; background: #fff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; height: 80vh; display: flex; flex-direction: column;}
+
+    /* 聊天区 */
+    .chat-window { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 45vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; }
+    .welcome-board { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #64748b; text-align: center; }
+    .welcome-board h2 { color: #1e3a8a; margin-bottom: 10px; font-size: 22px; }
+    
+    .message { max-width: 80%; padding: 12px 16px; border-radius: 8px; font-size: 16px; line-height: 1.6; animation: fadeIn 0.3s ease; cursor: pointer; position: relative; transition: 0.2s;}
+    .message:hover { filter: brightness(0.95); }
+    .message:hover::after { content: "点击复制"; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #94a3b8; }
+    .message.sales { align-self: flex-end; background-color: var(--sales-bg); color: #1e3a8a; border-bottom-right-radius: 0; }
+    .message.client { align-self: flex-start; background-color: var(--client-bg); color: #0f172a; border-bottom-left-radius: 0; border-left: 4px solid #94a3b8; }
+    
+    .action-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .action-title { font-weight: bold; margin-bottom: 15px; color: var(--primary-color); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+    .btn-group { display: flex; flex-direction: column; gap: 10px; }
+    .btn { background-color: #f8fafc; color: var(--text-color); border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 16px; text-align: left; transition: all 0.2s; }
+    .btn:hover { background-color: #e2e8f0; border-color: #cbd5e1; }
+    .btn.sales-btn { border-left: 5px solid var(--secondary-color); }
+    .btn.client-btn { border-left: 5px solid #94a3b8; }
+    .btn-hangup { background-color: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; display: none; }
+    
+    .report-card { display: none; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid #ef4444; margin-top: 20px; }
+    .report-card h3 { margin-top: 0; color: #ef4444; }
+    .report-item { margin-bottom: 10px; font-size: 16px; }
+
+    /* 右侧 超级 CRM 面板 */
+    .crm-header { font-size: 18px; color: var(--primary-color); font-weight: bold; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
+    .crm-list { flex: 1; overflow-y: auto; padding-right: 5px;}
+    .crm-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+    .crm-card:hover { border-color: #93c5fd; box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
+    .crm-card.overdue { border-color: #fca5a5; background: #fef2f2; }
+    .crm-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
+    .crm-tag-prov { font-size: 12px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle;}
+    .crm-name { font-weight: bold; color: #1e293b; font-size: 16px; display: flex; align-items: center;}
+    .crm-level { font-size: 12px; padding: 3px 8px; border-radius: 12px; color: white; font-weight: bold;}
+    .crm-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center;}
+    .crm-row label { font-size: 13px; color: #64748b; width: 60px; flex-shrink: 0;}
+    .crm-row select, .crm-row input { flex: 1; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; outline: none;}
+    .crm-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;}
+    .tag-btn { font-size: 12px; padding: 4px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;}
+    .tag-btn.active { background: #3b82f6; color: white; border-color: #3b82f6;}
+    .crm-memo { width: 100%; height: 40px; font-size: 13px; border: 1px solid #e2e8f0; border-radius: 4px; padding: 8px; box-sizing: border-box; resize: none; background: #f8fafc; margin-bottom: 10px;}
+    .crm-memo:focus { background: #fff; border-color: #3b82f6; outline: none;}
+    .crm-actions { display: flex; gap: 5px; flex-wrap: wrap; border-top: 1px dashed #e2e8f0; padding-top: 10px;}
+    .btn-script { flex: 1; font-size: 12px; padding: 6px 4px; border-radius: 4px; border: 1px solid #cbd5e1; background: #f8fafc; color: #1e3a8a; cursor: pointer; font-weight: bold; transition: 0.2s;}
+    .btn-script:hover { background: #dbeafe; border-color: #3b82f6;}
+
+    #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; z-index: 2000;}
+    
+    /* 弹窗与树状图 */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 1100px; height: 85vh; display: flex; gap: 20px; box-sizing: border-box; }
+    
+    .tree-nav { width: 280px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; flex-shrink: 0; display: flex; flex-direction: column; }
+    .tree-nav h3 { font-size: 16px; color: #1e3a8a; margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+    .tree-list-container { flex: 1; overflow-y: auto; margin-bottom: 15px;}
+    
+    .tree-node { margin-bottom: 4px; }
+    .tree-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #475569; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
+    .tree-item:hover { background: #e2e8f0; }
+    .tree-item.active { background: #dbeafe; color: #1e3a8a; font-weight: bold; border: 1px solid #93c5fd;}
+    .tree-item.prov-btn { background: #fef08a; color: #92400e; font-weight: bold; border: 1px solid #fde047; margin-bottom: 15px;}
+    .tree-item.prov-btn.active { background: #eab308; color: white;}
+    .tree-toggle { width: 20px; text-align: center; cursor: pointer; color: #94a3b8; font-size: 12px; margin-right: 5px;}
+    .tree-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+    .tree-delete { color: #ef4444; font-weight: bold; padding: 2px 5px; border-radius: 4px; opacity: 0.3;}
+    .tree-item:hover .tree-delete { opacity: 1; }
+    .tree-delete:hover { background: #fee2e2; }
+    
+    .tree-children { padding-left: 20px; display: block; border-left: 1px dashed #cbd5e1; margin-left: 10px; }
+    .tree-children.collapsed { display: none; }
+
+    .editor-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden;}
+    .editor-header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; }
+    .editor-header-bar h2 { margin: 0; color: var(--primary-color); font-size: 20px;}
+    .editor-content { flex: 1; overflow-y: auto; padding-right: 10px;}
+    .node-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+    .node-title { font-size: 16px; font-weight: bold; color: #1e3a8a; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #475569; }
+    .form-group textarea, .form-group input[type="text"], .form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 15px; box-sizing: border-box; }
+    .form-group textarea { height: 100px; resize: vertical; }
+    .prov-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .prov-item { display: flex; flex-direction: column; }
+    .prov-item label { font-size: 13px; color: #1e3a8a; font-weight: bold; margin-bottom: 5px;}
+    .prov-item input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box;}
+    .branch-list { margin-left: 10px; padding-left: 20px; border-left: 2px dashed #cbd5e1; }
+    .branch-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; margin-bottom: 10px; position: relative; display: flex; gap:10px; align-items:center;}
+    .branch-item::before { content: ""; position: absolute; left: -22px; top: 50%; width: 20px; height: 2px; background: #cbd5e1; transform: translateY(-50%);}
+    .branch-item input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
+    .branch-item select { width: 150px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
+    .branch-item .del-branch { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+    .btn-save { background: #22c55e; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;}
+    .btn-add { background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px;}
+    .region-selector { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
+    .region-selector select { padding: 12px; border-radius: 6px; border: 2px solid var(--secondary-color); font-size: 16px; font-weight: bold; color: var(--primary-color); outline: none; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div id="toast">✅ 话术已复制，可直接粘贴发送</div>
+
+<div class="top-bar">
+    <h1>瑞泽净化 - 销售管理与外呼沙盘</h1>
+    <div id="clientInfoBox" class="top-input-group">
+        <label>客户信息：</label>
+        <input type="text" id="clientSurname" placeholder="姓氏(如:薛)">
+        <input type="text" id="clientCompany" placeholder="公司(如:盈安气体)" style="width: 160px;">
+    </div>
+    <button class="btn-settings" onclick="openSettings()">⚙️ 话术与逻辑配置</button>
+</div>
+
+<div class="main-layout">
+    <div class="left-panel">
+        <div class="chat-window" id="chatWindow">
+            <div class="welcome-board" id="welcomeBoard">
+                <h2>📞 销售实战准备就绪</h2>
+                <p>请在顶部填写客户信息，选择下方省份，然后拨出电话。</p>
+            </div>
+        </div>
+
+        <div class="action-panel" id="actionPanel">
+            <div class="action-title">
+                <span id="actionTitle">准备开始通话</span>
+                <button class="btn-hangup" id="hangupBtn" onclick="hangUpCall()">☎️ 强制挂断</button>
+            </div>
+            <div id="regionBox" class="region-selector">
+                <label style="font-weight:bold; color:#1e3a8a;">目标省份：</label>
+                <select id="provinceSelect"></select>
+            </div>
+            <div class="btn-group" id="btnGroup">
+                <button class="btn sales-btn" onclick="startCall()">📞 拨出电话</button>
+            </div>
+        </div>
+
+        <div class="report-card" id="reportCard">
+            <h3>📊 客户意向度分析报告</h3>
+            <div class="report-item" id="reportLevel"></div>
+            <div class="report-item" id="reportReason"></div>
+            <div class="report-item" id="reportAction"></div>
+            <button class="btn-submit" style="margin-top: 15px; background: #64748b; width: 100%;" onclick="resetCall()">🔄 结束通话，开始新电话</button>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="crm-header">
+            <span>📇 客户跟进中心</span>
+            <button style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px;" onclick="clearCRM()">清空</button>
+        </div>
+        <div class="crm-list" id="crmList"></div>
+    </div>
+</div>
+
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <div class="tree-nav">
+            <h3>话术流程配置</h3>
+            <button class="btn-add" onclick="addNewNode()">➕ 新建独立话术节点</button>
+            <div class="tree-item prov-btn" id="nav_prov" onclick="selectProvinceEditor()">🌍 全国各省同行库</div>
+            <div class="tree-list-container" id="treeNavList"></div>
+            <button class="btn-save" onclick="saveSettings()">💾 保存并生效</button>
+            <button style="background: #94a3b8; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 10px;" onclick="closeSettings()">取消</button>
+        </div>
+        
+        <div class="editor-panel">
+            <div class="editor-header-bar"><h2 id="editorHeader">节点编辑器</h2></div>
+            <div class="editor-content" id="editorContainer"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getTodayStr() {
+        var d = new Date();
+        return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+    }
+
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    }
+
+    function copyToClipboard(text) {
+        var tempInput = document.createElement("textarea");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        showToast("✅ 跟进话术已复制！");
+    }
+
+    var allProvinces = ["北京", "天津", "河北", "山西", "内蒙古", "辽宁", "吉林", "黑龙江", "上海", "江苏", "浙江", "安徽", "福建", "江西", "山东", "河南", "湖北", "湖南", "广东", "广西", "海南", "重庆", "四川", "贵州", "云南", "西藏", "陕西", "甘肃", "青海", "宁夏", "新疆", "台湾", "香港", "澳门"];
+
+    // 全新升级的完整话术库
+    var defaultFlow = {
+        "开场白": {
+            text: "[姓氏]总，您好！我是瑞泽净小薛，主要做气体纯化设备的。全国合作气站挺多，像咱们[地区]这边，[同行1]、[同行2]、[同行3]都有装我们的设备。这次打电话给您，主要是想了解下，您这边目前有没有上纯化设备的需求？现在市场上客户对咱们工业气体，特别是氩气，氮气的纯度要求越来越高了",
+            branches: [
+                { text: "“你们设备多少钱？”（直接问价）", target: "直接问价" },
+                { text: "“我们原液就是5个9的高纯，不需要纯化！”", target: "炫耀原液" },
+                { text: "“暂时没有这个需求 / 我们纯度没问题。”", target: "拒绝观望" }
+            ]
+        },
+        "直接问价": {
+            text: "看您这边需求，我们一般给气站配的都是高压直充型，有50方、200方、300方，价格4万~9万不等。不过具体要看您的配置要求。您这边计划想要一小时充多少瓶的，或者预算大概在什么范围？要不我加下您微信，给您发份资料了解一下，到时候按您需求，我再帮您推荐个合适的类型。",
+            branches: [
+                { text: "“太贵了，别家便宜很多。”", target: "嫌贵算账" },
+                { text: "“你们工艺怎么样？耗材能用多久？”", target: "问技术" },
+                { text: "可以（加微信）", target: "加微信" }
+            ]
+        },
+        "炫耀原液": {
+            text: "明白了[姓氏]总。既然咱们用的是5个9的高纯原液，说明[公司]在原料把控上是非常严格的。不过很多大站之所以在充装端再加一台纯化设备，主要是为了防范充装环节的二次污染。咱们这台设备，就是给您的原液做最后一道精准过滤，确保每一瓶交到终端客户手里纯度都稳稳在6个9以上。这样您拿着检测数据去接高端单子，底气足，利润也高。您觉得呢？",
+            branches: [
+                { text: "“加个设备又得多花钱吧？”", target: "嫌贵算账" },
+                { text: "“行，你加我微信，发点案例看看。”", target: "加微信" }
+            ]
+        },
+        "拒绝观望": {
+            text: "那说明咱们[公司]品质把控得好。不过现在纯度没问题，不代表以后一直没问题。外购液氩批次有波动，设备用久了吸附剂也会老化，很多气站是被高端客户抽检退货了才发现。您平时有遇到要求6个9超纯气的单子吗？",
+            branches: [
+                { text: "“以后再说吧。”", target: "观望结束" },
+                { text: "“你们工艺怎么样？”", target: "问技术" }
+            ]
+        },
+        "嫌贵算账": {
+            text: "理解。但咱们算笔账，您外购高纯气每瓶多花几十块，用咱们设备自己提纯，不到一年省下的气体差价就把设备钱赚回来了。",
+            branches: [
+                { text: "“那你帮我算算多久能回本？”", target: "加微信" },
+                { text: "“人家江苏的才四五万，你们凭什么这么贵？”", target: "亮底牌" }
+            ]
+        },
+        "亮底牌": {
+            text: "[姓氏]总，您看下我们的业绩表。像您这边的[同行1]、[同行2]用的都是咱们的设备。另外像中科院金属研究所、中国航天用的也是我们的。连航天军工级别的纯度我们都能保，气站提纯对咱们来说是大材小用。",
+            branches: [
+                { text: "“行吧，你把业绩表发我微信看看。”", target: "加微信" }
+            ]
+        },
+        "问技术": {
+            text: "我们用的是分级纯化：先脱氧、脱甲烷，再吸附水分和二氧化碳。两级处理，纯度更稳定。干燥器能处理10000多瓶才需再生，吸附剂寿命好几年。您目前用的设备多久再生一次？",
+            branches: [
+                { text: "“听上去可以，你加我微信发资料看看。”", target: "加微信" }
+            ]
+        },
+        "加微信": {
+            text: "好的[姓氏]总，那我马上加您微信。我把详细参数和投资回报测算表发您。您先看一眼，有问题随时找我。",
+            branches: [
+                { text: "✅ 成功加微，锁定A类客户", target: "成功结束" }
+            ]
+        },
+        "成功结束": { isEnd: true, level: "A", reason: "客户成功同意加微信，属于极高质量客户。", action: "1小时内发送资料，3天后语音跟进。" },
+        "观望结束": { isEnd: true, level: "C", reason: "客户目前处于观望状态。", action: "加微信发行业报告，3天后跟进。" }
+    };
+
+    var defaultProv = {};
+    var realData = {
+        "山东": "山东天海气体、诸城广源气体、临沂盈安气体、淄博桓台瑞丰气体、淄博锦庄气体、青岛宝发物资",
+        "湖北": "武汉同和气体、宜昌得心气体、荆门华强气体、湖北弘安气体、阳逻国跃气体、武汉华尔文气体",
+        "江苏": "苏州华业气体、常州武进华阳气体、南京立业气体、扬州创新气体、徐州劲鹏气体、无锡华盛气体",
+        "河北": "石家庄福利乙炔气厂、邯郸裕方贸易、廊坊威马机床、河北汇泉环保、唐山化学厂",
+        "广东": "广东阳江同德气体、深圳伽玛纳米、亚浩电子五金、佛山中研非晶、东莞速迈德电子",
+        "四川": "四川均腾气体、绵阳瑞联特、成都温江凯力气体、眉山彭山鑫源气体、遂宁广润氧气",
+        "湖南": "湖南九山半导体、益阳中大气体、宁乡中胜气体、湖南顶立科技、长沙长钢气体",
+        "山西": "山西立恒钢铁、山西德泰兴业、山西明纳能源、山西华耀亿嘉、山西兴业精机",
+        "辽宁": "沈阳有色金属研究所、营口东兴气体、锦州全福气体、丹东黄海动力、辽宁海宝轧辊",
+        "浙江": "浙江欧特森气体、杭州临安气体、宁波方迪新能源、绍兴富源特气",
+        "安徽": "安庆六方气体、合肥俊麟科技、芜湖仁龙特气、马鞍山新桦气体"
+    };
+    allProvinces.forEach(function(prov) {
+        defaultProv[prov] = realData[prov] ? realData[prov] : prov + "某某气站、" + prov + "某某制氧厂";
+    });
+
+    var flowData = JSON.parse(localStorage.getItem('ruizeFlowV34') || JSON.stringify(defaultFlow));
+    var provinceData = JSON.parse(localStorage.getItem('ruizeProvV34') || JSON.stringify(defaultProv));
+
+    var provSelect = document.getElementById('provinceSelect');
+    allProvinces.forEach(function(prov) {
+        var opt = document.createElement('option');
+        opt.value = prov; opt.innerText = prov;
+        provSelect.appendChild(opt);
+    });
+
+    var chatWindow = document.getElementById('chatWindow');
+    var btnGroup = document.getElementById('btnGroup');
+    var actionTitle = document.getElementById('actionTitle');
+    var welcomeBoard = document.getElementById('welcomeBoard');
+    var hangupBtn = document.getElementById('hangupBtn');
+    
+    var currentSurname = "王";
+    var currentCompany = "XX气体";
+    var currentProvince = "山东";
+    var isCalling = false;
+    var isFinished = false; 
+
+    // ================= 超级 CRM 逻辑 =================
+    function loadCRM() {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var list = document.getElementById('crmList');
+        var today = getTodayStr();
+        
+        if(crmData.length === 0) {
+            list.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:20px; font-size:14px;">暂无客户档案<br>打通电话后自动生成</div>';
+            return;
+        }
+        
+        list.innerHTML = '';
+        crmData.sort((a, b) => {
+            if(!a.nextDate) return 1;
+            if(!b.nextDate) return -1;
+            return new Date(a.nextDate) - new Date(b.nextDate);
+        });
+
+        crmData.forEach(function(cust, index) {
+            var levelColor = cust.level === 'A' ? '#ef4444' : (cust.level === 'B' ? '#f59e0b' : (cust.level === 'C' ? '#3b82f6' : '#64748b'));
+            var isOverdue = cust.nextDate && cust.nextDate <= today && cust.status !== '已成交' && cust.status !== '已流失';
+            var cardClass = isOverdue ? 'crm-card overdue' : 'crm-card';
+
+            var div = document.createElement('div');
+            div.className = cardClass;
+            
+            var tags = cust.tags || [];
+            var tagList = ['冲降本', '接高端', '同行逼', '产能扩建'];
+            var tagsHtml = tagList.map(t => `<span class="tag-btn ${tags.includes(t)?'active':''}" onclick="toggleTag('${cust.company}', '${cust.surname}', '${t}')">${t}</span>`).join('');
+
+            var provTag = cust.province ? `<span class="crm-tag-prov">${cust.province}</span>` : '';
+
+            div.innerHTML = `
+                <div class="crm-card-top">
+                    <span class="crm-name">${provTag}${cust.company} - ${cust.surname}总</span>
+                    <span class="crm-level" style="background:${levelColor}">${cust.level}类</span>
+                </div>
+                <div class="crm-row">
+                    <label>跟进状态：</label>
+                    <select onchange="updateCRM('${cust.company}', '${cust.surname}', 'status', this.value)">
+                        <option value="待跟进" ${cust.status==='待跟进'?'selected':''}>🟡 待跟进</option>
+                        <option value="已发资料" ${cust.status==='已发资料'?'selected':''}>🔵 已发资料</option>
+                        <option value="已成交" ${cust.status==='已成交'?'selected':''}>🟢 已成交</option>
+                        <option value="已流失" ${cust.status==='已流失'?'selected':''}>🔴 已流失</option>
+                    </select>
+                </div>
+                <div class="crm-row">
+                    <label>下次跟进：</label>
+                    <input type="date" value="${cust.nextDate || ''}" onchange="updateCRM('${cust.company}', '${cust.surname}', 'nextDate', this.value)">
+                </div>
+                <div class="crm-tags">${tagsHtml}</div>
+                <textarea class="crm-memo" placeholder="备忘..." onchange="updateCRM('${cust.company}', '${cust.surname}', 'memo', this.value)">${cust.memo || ''}</textarea>
+                
+                <div class="crm-actions">
+                    <button class="btn-script" onclick="genScript('${cust.company}', '${cust.surname}', '${cust.province || '山东'}', 'sendInfo')">📁 发资料</button>
+                    <button class="btn-script" onclick="genScript('${cust.company}', '${cust.surname}', '${cust.province || '山东'}', 'closeDeal')">💰 嫌贵逼单</button>
+                    <button class="btn-script" onclick="genScript('${cust.company}', '${cust.surname}', '${cust.province || '山东'}', 'invite')">📞 邀约面谈</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function saveToCRM(level, reason) {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var existingIndex = crmData.findIndex(c => c.company === currentCompany && c.surname === currentSurname);
+        
+        if (existingIndex > -1) {
+            crmData[existingIndex].level = level;
+            crmData[existingIndex].reason = reason;
+            crmData[existingIndex].province = currentProvince;
+            if(!crmData[existingIndex].nextDate) {
+                var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+                crmData[existingIndex].nextDate = tomorrow.toISOString().split('T')[0];
+            }
+        } else {
+            var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+            crmData.unshift({
+                surname: currentSurname,
+                company: currentCompany,
+                province: currentProvince,
+                level: level,
+                reason: reason,
+                status: level === 'D' ? "已流失" : "待跟进",
+                nextDate: level === 'D' ? "" : tomorrow.toISOString().split('T')[0],
+                tags: [],
+                memo: ""
+            });
+        }
+        localStorage.setItem('ruizeCRM_v34', JSON.stringify(crmData));
+        loadCRM();
+    }
+
+    function updateCRM(company, surname, field, value) {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var realIndex = crmData.findIndex(c => c.company === company && c.surname === surname);
+        if (realIndex > -1) {
+            crmData[realIndex][field] = value;
+            localStorage.setItem('ruizeCRM_v34', JSON.stringify(crmData));
+            if(field === 'status' || field === 'nextDate') loadCRM(); 
+        }
+    }
+
+    function toggleTag(company, surname, tag) {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var realIndex = crmData.findIndex(c => c.company === company && c.surname === surname);
+        if(realIndex > -1) {
+            var tags = crmData[realIndex].tags || [];
+            if(tags.includes(tag)) tags = tags.filter(t => t !== tag);
+            else tags.push(tag);
+            crmData[realIndex].tags = tags;
+            localStorage.setItem('ruizeCRM_v34', JSON.stringify(crmData));
+            loadCRM();
+        }
+    }
+
+    function genScript(company, surname, province, type) {
+        var script = "";
+        var peerStr = provinceData[province] || "同行";
+        var peers = peerStr.split(/[、,，\s]+/).filter(item => item.trim() !== "").sort(() => 0.5 - Math.random());
+        var peer1 = peers[0] || "当地气站";
+
+        if (type === 'sendInfo') {
+            script = `${surname}总您好，我是瑞泽净化的小薛。今天跟您电话沟通得很愉快，这是我们氩气/氮气纯化设备的详细参数和落地案例（像咱们省的${peer1}都在用），您先抽空看一眼。有任何技术问题随时找我！`;
+        } else if (type === 'closeDeal') {
+            script = `${surname}总，上次咱们聊到设备价格，我知道您对预算有考量。但咱们算笔账，用咱们设备自己提纯，一瓶气省下几十块，不到一年设备钱就赚回来了。像您这边的${peer1}也是这么算账的，早买早省钱。您看这周我给您安排个视频连线，把回本账再给您算细一点？`;
+        } else if (type === 'invite') {
+            script = `${surname}总，为了给您出具最精准的选型方案，我想安排咱们技术总工去您站里实地测一下气体纯度，看看管道布局。也就占用您二十分钟，您看这周四还是周五方便？`;
+        }
+        copyToClipboard(script);
+    }
+
+    function clearCRM() {
+        if(confirm("确定要清空所有客户档案吗？此操作不可逆！")) {
+            localStorage.removeItem('ruizeCRM_v34');
+            loadCRM();
+        }
+    }
+
+    // ================= 通话逻辑 =================
+    function appendMessage(text, sender) {
+        if(!text) return;
+        var div = document.createElement('div');
+        div.className = 'message ' + sender;
+        div.innerText = text;
+        div.onclick = function() { 
+            copyToClipboard(text);
+            this.style.color = "#22c55e";
+            setTimeout(() => { this.style.color = ""; }, 300);
+        };
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function resetCall() {
+        chatWindow.innerHTML = '';
+        chatWindow.appendChild(welcomeBoard);
+        welcomeBoard.style.display = 'flex';
+        document.getElementById('reportCard').style.display = 'none';
+        document.getElementById('actionPanel').style.display = 'block';
+        hangupBtn.style.display = 'none';
+        actionTitle.innerText = "准备开始通话";
+        btnGroup.innerHTML = '<button class="btn sales-btn" onclick="startCall()">📞 拨出电话</button>';
+        isCalling = false;
+        isFinished = false; 
+    }
+
+    function startCall() {
+        currentSurname = document.getElementById('clientSurname').value.trim() || "王";
+        currentCompany = document.getElementById('clientCompany').value.trim() || "XX气体";
+        currentProvince = provSelect.value; 
+        chatWindow.innerHTML = '';
+        welcomeBoard.style.display = 'none';
+        hangupBtn.style.display = 'block';
+        isCalling = true;
+        isFinished = false;
+        loadNode('开场白');
+    }
+
+    function hangUpCall() {
+        if(!isCalling) return;
+        isCalling = false;
+        hangupBtn.style.display = 'none';
+        btnGroup.innerHTML = '';
+        actionTitle.innerText = "通话已结束";
+        setTimeout(function() { finishCall("D", "强行挂断", "3天后发微信"); }, 500);
+    }
+
+    function loadNode(nodeId) {
+        if(!isCalling || isFinished) return; 
+        
+        var node = flowData[nodeId];
+        if (!node) { 
+            finishCall("C", "未找到该节点，可能已被删除", "检查话术库"); 
+            return; 
+        }
+
+        var peerStr = provinceData[currentProvince] || "XX省新星气体";
+        var peers = peerStr.split(/[、,，\s]+/).filter(item => item.trim() !== "").sort(() => 0.5 - Math.random());
+        var finalText = node.text.replace(/\[姓氏\]/g, currentSurname).replace(/\[公司\]/g, currentCompany).replace(/\[地区\]/g, currentProvince).replace(/\[同行1\]/g, peers[0] || "").replace(/\[同行2\]/g, peers[1] || "");
+
+        if (finalText) appendMessage(finalText, "sales");
+
+        if (node.isEnd) { 
+            finishCall(node.level, node.reason, node.action); 
+            return; 
+        }
+
+        actionTitle.innerText = "客户回复：";
+        btnGroup.innerHTML = '';
+        if (node.branches) {
+            node.branches.forEach(function(branch) {
+                var btn = document.createElement('button');
+                btn.className = 'btn client-btn';
+                btn.innerText = branch.text;
+                btn.onclick = function() { 
+                    if(!isCalling || isFinished) return;
+                    if (branch.target === '成功结束' || branch.target === '观望结束' || branch.text.includes("成功加微")) {
+                        appendMessage(branch.text, "client");
+                        finishCall("A", "客户成功加微。", "1小时内发送资料，3天后跟进。");
+                        return;
+                    }
+                    appendMessage(branch.text, "client");
+                    loadNode(branch.target); 
+                };
+                btnGroup.appendChild(btn);
+            });
+        }
+    }
+
+    function finishCall(level, reason, action) {
+        if(isFinished) return; 
+        isFinished = true;
+        isCalling = false;
+        hangupBtn.style.display = 'none';
+        
+        document.getElementById('actionPanel').style.display = 'none';
+        var reportCard = document.getElementById('reportCard');
+        reportCard.style.display = 'block';
+        
+        var colorMap = {'A': '#ef4444', 'B': '#f59e0b', 'C': '#3b82f6', 'D': '#64748b'};
+        reportCard.style.borderTopColor = colorMap[level] || '#64748b';
+        document.getElementById('reportLevel').innerHTML = '🎯 客户等级：<strong style="color:' + (colorMap[level]||'#64748b') + '; font-size: 24px;">' + level + ' 类客户</strong>';
+        document.getElementById('reportReason').innerHTML = '💡 判定依据：' + reason;
+        document.getElementById('reportAction').innerHTML = '📅 跟进建议：<strong>' + action + '</strong>';
+        
+        saveToCRM(level, reason);
+    }
+
+    // ================= 配置逻辑（树状图部分） =================
+    function openSettings() {
+        document.getElementById('settingsModal').style.display = 'flex';
+        renderTreeNav();
+        selectNode('开场白');
+    }
+
+    // 核心：渲染折叠树状目录
+    function renderTreeNav() {
+        var nav = document.getElementById('treeNavList'); 
+        nav.innerHTML = '';
+        
+        var targetNodes = [];
+        for(var k in flowData) {
+            if(flowData[k].branches) {
+                flowData[k].branches.forEach(b => { if(b.target) targetNodes.push(b.target); });
+            }
+        }
+
+        for(var key in flowData) {
+            if (targetNodes.includes(key) && key !== '开场白') continue;
+
+            var wrapper = document.createElement('div');
+            wrapper.className = 'tree-node';
+            
+            var item = document.createElement('div');
+            item.className = 'tree-item';
+            item.id = 'nav_' + key.replace(/\s/g, '');
+            
+            var hasChildren = flowData[key].branches && flowData[key].branches.length > 0;
+            var toggleIcon = hasChildren ? '<span class="tree-toggle" onclick="toggleTree(this)">▼</span>' : '<span class="tree-toggle"></span>';
+            
+            item.innerHTML = `<div style="display:flex; align-items:center; flex:1;">${toggleIcon}<span class="tree-title">${key}</span></div><span class="tree-delete" onclick="deleteNode(event, '${key}')">✖</span>`;
+            item.onclick = function(k) { return function(e) { 
+                if(e.target.className !== 'tree-delete') selectNode(k); 
+            }; }(key);
+            
+            wrapper.appendChild(item);
+
+            if (hasChildren) {
+                var childContainer = document.createElement('div');
+                childContainer.className = 'tree-children';
+                var renderedTargets = [];
+                
+                flowData[key].branches.forEach(b => {
+                    if(b.target && !renderedTargets.includes(b.target)) {
+                        renderedTargets.push(b.target);
+                        var childNode = document.createElement('div');
+                        childNode.className = 'tree-item';
+                        childNode.id = 'nav_' + b.target.replace(/\s/g, '');
+                        childNode.innerHTML = `<span class="tree-title">↳ ${b.target}</span>`;
+                        childNode.onclick = function(t) { return function(e) { e.stopPropagation(); selectNode(t); }; }(b.target);
+                        childContainer.appendChild(childNode);
+                    }
+                });
+                wrapper.appendChild(childContainer);
+            }
+            nav.appendChild(wrapper);
+        }
+    }
+
+    function toggleTree(el) {
+        var children = el.closest('.tree-node').querySelector('.tree-children');
+        if(children) {
+            if(children.classList.contains('collapsed')) {
+                children.classList.remove('collapsed');
+                el.innerText = '▼';
+            } else {
+                children.classList.add('collapsed');
+                el.innerText = '▶';
+            }
+        }
+    }
+
+    function selectNode(nodeId) {
+        document.getElementById('nav_prov').classList.remove('active');
+        document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+        var navItems = document.querySelectorAll('.tree-item');
+        navItems.forEach(el => {
+            if(el.innerText.includes(nodeId)) el.classList.add('active');
+        });
+
+        document.getElementById('editorHeader').innerText = "节点编辑器：" + nodeId;
+        var container = document.getElementById('editorContainer'); container.innerHTML = '';
+        var node = flowData[nodeId];
+        if (!node) { container.innerHTML = '<p>节点不存在</p>'; return; }
+        
+        if (node.isEnd) {
+            container.innerHTML = `<div class="node-box"><div class="node-title">✅ 结局节点配置</div>
+                <div class="form-group"><label>客户评级 (A/B/C/D)：</label><input type="text" id="edit_level" value="${node.level}"></div>
+                <div class="form-group"><label>判定依据：</label><input type="text" id="edit_reason" value="${node.reason}"></div>
+                <div class="form-group"><label>跟进建议：</label><input type="text" id="edit_action" value="${node.action}"></div>
+                <button class="btn-submit" onclick="saveEndNode('${nodeId}')">保存结局配置</button></div>`;
+        } else {
+            var branchesHtml = '';
+            if (node.branches) {
+                node.branches.forEach(function(branch, i) {
+                    var options = ''; for(var k in flowData) options += `<option value="${k}" ${branch.target === k ? 'selected' : ''}>${k}</option>`;
+                    branchesHtml += `<div class="branch-item"><input type="text" value="${branch.text}" onchange="flowData['${nodeId}'].branches[${i}].text = this.value"><select onchange="flowData['${nodeId}'].branches[${i}].target = this.value">${options}</select><button class="del-branch" onclick="deleteBranch('${nodeId}', ${i})">删</button></div>`;
+                });
+            }
+            container.innerHTML = `<div class="node-box"><div class="node-title"><span>销售话术</span></div>
+                <div class="form-group"><textarea id="edit_text" onchange="flowData['${nodeId}'].text = this.value">${node.text}</textarea></div>
+                <div class="node-title"><span>客户反应分支</span><button class="btn-add" style="margin:0; padding:5px 10px; font-size:12px;" onclick="addBranch('${nodeId}')">➕ 增加一条反应</button></div>
+                <div class="branch-list">${branchesHtml || '<p>暂无</p>'}</div></div>`;
+        }
+    }
+
+    function addNewNode() { var name = prompt("节点名称:"); if(!name) return; if(flowData[name]) { alert("已存在"); return; } flowData[name] = { text: "新话术...", branches: [] }; renderTreeNav(); selectNode(name); }
+    
+    function deleteNode(e, name) { 
+        e.stopPropagation(); 
+        if(name === '开场白') { alert("不能删开场白"); return; } 
+        if(confirm(`确定删除节点【${name}】吗？其他节点如果指向它，将会失效。`)) { 
+            delete flowData[name]; 
+            for(var k in flowData) {
+                if(flowData[k].branches) {
+                    flowData[k].branches.forEach(b => { if(b.target === name) b.target = ''; });
+                }
+            }
+            renderTreeNav(); 
+            document.getElementById('editorContainer').innerHTML = '<p style="text-align:center; color:#94a3b8; margin-top:50px;">节点已删除</p>';
+        } 
+    }
+
+    function addBranch(nodeId) { flowData[nodeId].branches.push({ text: "客户的新回应", target: "开场白" }); renderTreeNav(); selectNode(nodeId); }
+    function deleteBranch(nodeId, index) { flowData[nodeId].branches.splice(index, 1); renderTreeNav(); selectNode(nodeId); }
+    function saveEndNode(nodeId) { flowData[nodeId].level = document.getElementById('edit_level').value; flowData[nodeId].reason = document.getElementById('edit_reason').value; flowData[nodeId].action = document.getElementById('edit_action').value; alert("请点保存并生效"); }
+    
+    function selectProvinceEditor() {
+        document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active')); document.getElementById('nav_prov').classList.add('active');
+        document.getElementById('editorHeader').innerText = "🌍 全国34省同行库管理";
+        var container = document.getElementById('editorContainer'); container.innerHTML = '';
+        var provHtml = `<div class="node-box"><div class="node-title">各省同行库 (没数据默认“某某气站”，请用顿号隔开)</div><div class="prov-grid">`;
+        allProvinces.forEach(function(prov) { provHtml += `<div class="prov-item"><label>${prov}：</label><input type="text" value="${provinceData[prov] || ''}" onchange="provinceData['${prov}'] = this.value" placeholder="输入同行..."></div>`; });
+        provHtml += `</div></div>`; container.innerHTML = provHtml;
+    }
+    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    function saveSettings() { localStorage.setItem('ruizeFlowV34', JSON.stringify(flowData)); localStorage.setItem('ruizeProvV34', JSON.stringify(provinceData)); closeSettings(); alert("配置已保存！"); }
+
+    window.onload = function() { loadCRM(); };
+</script>
+</body>
+</html>
