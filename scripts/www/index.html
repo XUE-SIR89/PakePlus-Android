@@ -3,227 +3,1317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>瑞泽净化 - 销售工作流系统 (全量话术自由版)</title>
+<title>瑞泽净化 - 销售工作流系统</title>
 <style>
+    /* ============================================
+       Design Tokens
+       ============================================ */
     :root {
-        --primary-color: #1e3a8a;
-        --secondary-color: #3b82f6;
-        --bg-color: #f1f5f9;
-        --text-color: #334155;
-        --card-bg: #ffffff;
-        --client-bg: #e2e8f0;
-        --sales-bg: #dbeafe;
+        --primary-50:  #eff6ff;
+        --primary-100: #dbeafe;
+        --primary-200: #bfdbfe;
+        --primary-300: #93c5fd;
+        --primary-400: #60a5fa;
+        --primary-500: #3b82f6;
+        --primary-600: #2563eb;
+        --primary-700: #1d4ed8;
+        --primary-800: #1e40af;
+        --primary-900: #1e3a8a;
+
+        --slate-50:  #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-600: #475569;
+        --slate-700: #334155;
+        --slate-800: #1e293b;
+        --slate-900: #0f172a;
+
+        --amber-50:  #fffbeb;
+        --amber-100: #fef3c7;
+        --amber-500: #f59e0b;
+        --amber-600: #d97706;
+        --amber-700: #b45309;
+
+        --emerald-50:  #ecfdf5;
+        --emerald-500: #10b981;
+        --emerald-600: #059669;
+
+        --rose-50:  #fff1f2;
+        --rose-500: #f43f5e;
+        --rose-600: #e11d48;
+
+        --violet-500: #8b5cf6;
+        --violet-600: #7c3aed;
+
+        /* Semantics */
+        --bg-page: #eef2f7;
+        --bg-card: #ffffff;
+        --bg-soft: #f8fafc;
+        --text-primary:   #1e293b;
+        --text-secondary: #475569;
+        --text-muted:     #94a3b8;
+        --border-light:  #e2e8f0;
+        --border-medium: #cbd5e1;
+
+        /* Radius */
+        --radius-sm: 8px;
+        --radius:    12px;
+        --radius-lg: 18px;
+
+        /* Shadows */
+        --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+        --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.03);
+        --shadow:    0 4px 10px -2px rgba(15, 23, 42, 0.07), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+        --shadow-md: 0 10px 24px -6px rgba(15, 23, 42, 0.1), 0 4px 8px -2px rgba(15, 23, 42, 0.05);
+        --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+        --ring:      0 0 0 3px rgba(59, 130, 246, 0.16);
     }
-    body { font-family: 'Microsoft YaHei', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-color); }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 20px auto; flex-wrap: wrap; gap: 10px; }
-    .top-bar h1 { color: var(--primary-color); margin: 0; font-size: 24px; }
-    .top-input-group { display: flex; gap: 10px; align-items: center; background: #e0f2fe; padding: 8px 15px; border-radius: 8px; border: 1px solid #bae6fd; }
-    .top-input-group label { font-size: 14px; font-weight: bold; color: #0284c7; }
-    .top-input-group input { padding: 6px 10px; border-radius: 4px; border: 1px solid #7dd3fc; font-size: 14px; outline: none; width: 110px; }
-    .btn-settings { background: #1e3a8a; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;}
-    .btn-settings:hover { background: #1e40af; }
-    .drill-btn { background: #7c3aed; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-left: 8px;}
-    .drill-btn:hover { background: #6d28d9; }
-    #clientType { padding:6px 8px; border-radius:4px; border:1px solid #7dd3fc; font-size:14px; font-weight:bold; color:#0284c7; outline:none; }
-    .main-layout { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; align-items: flex-start;}
-    .left-panel { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 0;}
-    .chat-window { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 45vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; }
-    .welcome-board { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #64748b; text-align: center; }
-    .welcome-board h2 { color: #1e3a8a; margin-bottom: 10px; font-size: 22px; }
-    .message { max-width: 80%; padding: 12px 16px; border-radius: 8px; font-size: 16px; line-height: 1.6; animation: fadeIn 0.3s ease; cursor: pointer; position: relative; transition: 0.2s;}
-    .message:hover { filter: brightness(0.95); }
-    .message:hover::after { content: "点击复制"; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #94a3b8; }
-    .message.sales { align-self: flex-end; background-color: var(--sales-bg); color: #1e3a8a; border-bottom-right-radius: 0; }
-    .message.client { align-self: flex-start; background-color: var(--client-bg); color: #0f172a; border-bottom-left-radius: 0; border-left: 4px solid #94a3b8; }
-    .action-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .action-title { font-weight: bold; margin-bottom: 15px; color: var(--primary-color); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-    .btn-group { display: flex; flex-direction: column; gap: 10px; }
-    .btn { background-color: #f8fafc; color: var(--text-color); border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 16px; text-align: left; transition: all 0.2s; }
-    .btn:hover { background-color: #e2e8f0; border-color: #cbd5e1; }
-    .btn.sales-btn { border-left: 5px solid var(--secondary-color); }
-    .btn.client-btn { border-left: 5px solid #94a3b8; }
-    .btn-hangup { background-color: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; display: none; }
-    .report-card { display: none; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid #ef4444; margin-top: 20px; }
-    .report-card h3 { margin-top: 0; color: #ef4444; }
-    .report-item { margin-bottom: 10px; font-size: 16px; }
-    .crm-header { font-size: 18px; color: var(--primary-color); font-weight: bold; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
-    .crm-list { padding-right: 5px;}
-    .crm-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
-    .crm-card:hover { border-color: #93c5fd; box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
-    .crm-card.overdue { border-color: #fca5a5; background: #fef2f2; }
-    .crm-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
-    .crm-tag-prov { font-size: 12px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle;}
-    .crm-name { font-weight: bold; color: #1e293b; font-size: 16px; display: flex; align-items: center;}
-    .crm-level { font-size: 12px; padding: 3px 8px; border-radius: 12px; color: white; font-weight: bold;}
-    .crm-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center;}
-    .crm-row label { font-size: 13px; color: #64748b; width: 60px; flex-shrink: 0;}
-    .crm-row select, .crm-row input { flex: 1; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; outline: none;}
-    .crm-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;}
-    .tag-btn { font-size: 12px; padding: 4px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;}
-    .tag-btn.active { background: #3b82f6; color: white; border-color: #3b82f6;}
-    .crm-memo { width: 100%; height: 40px; font-size: 13px; border: 1px solid #e2e8f0; border-radius: 4px; padding: 8px; box-sizing: border-box; resize: none; background: #f8fafc; margin-bottom: 10px;}
-    .crm-memo:focus { background: #fff; border-color: #3b82f6; outline: none;}
-    .crm-actions { display: flex; gap: 5px; flex-wrap: wrap; border-top: 1px dashed #e2e8f0; padding-top: 10px;}
-    .btn-script { flex: 1; font-size: 12px; padding: 6px 4px; border-radius: 4px; border: 1px solid #cbd5e1; background: #f8fafc; color: #1e3a8a; cursor: pointer; font-weight: bold; transition: 0.2s;}
-    .btn-script:hover { background: #dbeafe; border-color: #3b82f6;}
-    #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; z-index: 2000;}
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 1100px; height: 85vh; display: flex; gap: 20px; box-sizing: border-box; }
-    #crmModal .modal-content { display: block; max-width: 1000px; overflow: hidden; }
-    #crmModal .crm-list { max-height: calc(85vh - 130px); overflow-y: auto; }
-    .tree-nav { width: 280px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; flex-shrink: 0; display: flex; flex-direction: column; }
-    .tree-nav h3 { font-size: 16px; color: #1e3a8a; margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
-    .tree-list-container { flex: 1; overflow-y: auto; margin-bottom: 15px;}
+
+    /* ============================================
+       Base
+       ============================================ */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                     "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+        background:
+            radial-gradient(1200px 600px at 0% -10%, rgba(59,130,246,0.08), transparent 60%),
+            radial-gradient(900px 500px at 100% 0%, rgba(139,92,246,0.06), transparent 60%),
+            var(--bg-page);
+        margin: 0;
+        padding: 24px;
+        color: var(--text-primary);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.55;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+        background: var(--slate-300);
+        border-radius: 999px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--slate-400); background-clip: padding-box; }
+
+    button { font-family: inherit; }
+
+    /* ============================================
+       Top Bar
+       ============================================ */
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1440px;
+        margin: 0 auto 24px auto;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+    .top-bar h1 {
+        color: var(--primary-900);
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .top-bar h1::before {
+        content: "";
+        width: 6px;
+        height: 26px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--primary-500), var(--violet-500));
+        flex-shrink: 0;
+    }
+
+    .top-input-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: #fff;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-xs);
+        flex-wrap: wrap;
+    }
+    .top-input-group label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-700);
+        letter-spacing: 0.02em;
+    }
+    .top-input-group input,
+    #clientType {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border-light);
+        background: var(--slate-50);
+        font-size: 14px;
+        color: var(--text-primary);
+        outline: none;
+        transition: all 0.18s ease;
+    }
+    .top-input-group input { width: 130px; }
+    .top-input-group input:focus,
+    #clientType:focus {
+        border-color: var(--primary-400);
+        background: #fff;
+        box-shadow: var(--ring);
+    }
+    #clientType {
+        font-weight: 700;
+        color: var(--primary-700);
+        cursor: pointer;
+        padding-right: 30px;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    .btn-settings {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #fff;
+        border: none;
+        padding: 11px 20px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.4);
+    }
+    .btn-settings:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.5);
+    }
+
+    /* ============================================
+       Layout
+       ============================================ */
+    .main-layout {
+        display: flex;
+        gap: 24px;
+        max-width: 1440px;
+        margin: 0 auto;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+    .left-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    /* ============================================
+       Chat Window
+       ============================================ */
+    .chat-window {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        height: 45vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        position: relative;
+        scroll-behavior: smooth;
+    }
+
+    .welcome-board {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
+        text-align: center;
+        padding: 20px;
+    }
+    .welcome-board h2 {
+        color: var(--primary-800);
+        margin: 0 0 10px 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+    .welcome-board p { margin: 0; font-size: 15px; max-width: 360px; line-height: 1.7; }
+
+    .message {
+        max-width: 82%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 15px;
+        line-height: 1.65;
+        animation: messageIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+        word-wrap: break-word;
+    }
+    .message:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+    }
+    .message:hover::after {
+        content: "点击复制";
+        position: absolute;
+        right: 10px;
+        top: -10px;
+        font-size: 11px;
+        background: var(--slate-800);
+        color: #fff;
+        padding: 3px 8px;
+        border-radius: 6px;
+        opacity: 0.9;
+        white-space: nowrap;
+    }
+    .message.sales {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: var(--primary-900);
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.12);
+    }
+    .message.client {
+        align-self: flex-start;
+        background: #fff;
+        color: var(--slate-800);
+        border-bottom-left-radius: 6px;
+        border-left: 3px solid var(--slate-400);
+        box-shadow: var(--shadow-sm);
+    }
+
+    @keyframes messageIn {
+        from { opacity: 0; transform: translateY(8px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ============================================
+       Action Panel
+       ============================================ */
+    .action-panel {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 22px 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .action-title {
+        font-weight: 800;
+        margin-bottom: 16px;
+        color: var(--primary-900);
+        border-bottom: 2px solid var(--slate-100);
+        padding-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .btn {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1.5px solid var(--border-light);
+        padding: 14px 16px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-size: 15px;
+        text-align: left;
+        transition: all 0.18s ease;
+        box-shadow: var(--shadow-xs);
+        position: relative;
+        font-weight: 500;
+    }
+    .btn:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-300);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+        color: var(--primary-900);
+    }
+    .btn:active { transform: translateY(0); }
+    .btn.sales-btn {
+        border-left: 4px solid var(--primary-500);
+        background: linear-gradient(135deg, #fff, var(--primary-50));
+        color: var(--primary-800);
+        font-weight: 700;
+    }
+    .btn.sales-btn:hover {
+        background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    }
+    .btn.client-btn {
+        border-left: 4px solid var(--slate-400);
+    }
+
+    .btn-hangup {
+        background: linear-gradient(135deg, #f43f5e, #e11d48);
+        color: #fff;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 13px;
+        display: none;
+        transition: all 0.18s ease;
+        box-shadow: 0 4px 10px -4px rgba(244, 63, 94, 0.5);
+    }
+    .btn-hangup:hover { transform: translateY(-1px); box-shadow: 0 8px 16px -6px rgba(244, 63, 94, 0.6); }
+
+    /* Tip / Pain tags / Region */
+    .tip-box {
+        background: var(--amber-50);
+        border: 1px solid #fde68a;
+        border-left: 4px solid var(--amber-500);
+        padding: 12px 16px;
+        border-radius: var(--radius);
+        font-size: 14px;
+        color: var(--amber-700);
+        margin-bottom: 14px;
+        line-height: 1.65;
+    }
+    .pain-tag-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border-radius: var(--radius);
+        border: 1px dashed var(--primary-300);
+    }
+    .pain-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-700);
+    }
+    .pain-tag {
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1.5px solid var(--border-light);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.18s ease;
+        font-weight: 500;
+    }
+    .pain-tag:hover {
+        border-color: var(--primary-400);
+        color: var(--primary-700);
+        transform: translateY(-1px);
+    }
+    .pain-tag.active {
+        background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 4px 10px -4px rgba(59, 130, 246, 0.5);
+    }
+
+    .region-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        align-items: center;
+    }
+    .region-selector label {
+        font-weight: 700;
+        color: var(--primary-900);
+        font-size: 14px;
+        white-space: nowrap;
+    }
+    .region-selector select {
+        flex: 1;
+        padding: 11px 14px;
+        border-radius: var(--radius);
+        border: 1.5px solid var(--primary-300);
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--primary-800);
+        outline: none;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 36px;
+    }
+    .region-selector select:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+    }
+
+    /* ============================================
+       Report Card
+       ============================================ */
+    .report-card {
+        display: none;
+        background: #fff;
+        padding: 22px 24px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-top: 5px solid var(--rose-500);
+        margin-top: 4px;
+    }
+    .report-card h3 {
+        margin: 0 0 14px 0;
+        color: var(--slate-800);
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+    .report-item {
+        margin-bottom: 10px;
+        font-size: 15px;
+        color: var(--text-secondary);
+        line-height: 1.65;
+    }
+    .report-item:last-child { margin-bottom: 0; }
+
+    /* ============================================
+       Modals
+       ============================================ */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.2s ease;
+        padding: 20px;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        width: 95%;
+        max-width: 1100px;
+        height: 85vh;
+        display: flex;
+        gap: 20px;
+        padding: 24px;
+        box-sizing: border-box;
+        box-shadow: var(--shadow-lg);
+        animation: modalIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.96) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ============================================
+       CRM
+       ============================================ */
+    #crmModal .modal-content {
+        display: block;
+        max-width: 1000px;
+        padding: 24px;
+    }
+    .crm-header {
+        font-size: 17px;
+        color: var(--primary-900);
+        font-weight: 800;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 14px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        letter-spacing: -0.01em;
+    }
+    .crm-list {
+        max-height: calc(85vh - 130px);
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+    .crm-card {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 14px;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-xs);
+    }
+    .crm-card:hover {
+        border-color: var(--primary-300);
+        box-shadow: var(--shadow);
+        transform: translateY(-1px);
+    }
+    .crm-card.overdue {
+        border-color: #fecaca;
+        background: linear-gradient(135deg, #fef2f2, #fff1f2);
+    }
+    .crm-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .crm-tag-prov {
+        font-size: 11px;
+        background: var(--slate-100);
+        color: var(--slate-600);
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-right: 5px;
+        vertical-align: middle;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+    }
+    .crm-name {
+        font-weight: 700;
+        color: var(--slate-800);
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .crm-level {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .crm-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+        align-items: center;
+    }
+    .crm-row label {
+        font-size: 13px;
+        color: var(--text-muted);
+        width: 66px;
+        flex-shrink: 0;
+        font-weight: 500;
+    }
+    .crm-row select, .crm-row input {
+        flex: 1;
+        padding: 7px 10px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        outline: none;
+        background: var(--slate-50);
+        color: var(--text-primary);
+        transition: all 0.15s ease;
+    }
+    .crm-row select:focus, .crm-row input:focus {
+        border-color: var(--primary-400);
+        background: #fff;
+        box-shadow: var(--ring);
+    }
+    .crm-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+    .tag-btn {
+        font-size: 12px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: var(--slate-100);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-light);
+        cursor: pointer;
+        transition: all 0.18s ease;
+        font-weight: 500;
+    }
+    .tag-btn:hover {
+        border-color: var(--primary-300);
+        color: var(--primary-700);
+    }
+    .tag-btn.active {
+        background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 2px 8px -2px rgba(59, 130, 246, 0.5);
+    }
+    .crm-memo {
+        width: 100%;
+        height: 44px;
+        font-size: 13px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        box-sizing: border-box;
+        resize: none;
+        background: var(--slate-50);
+        margin-bottom: 10px;
+        font-family: inherit;
+        transition: all 0.15s ease;
+    }
+    .crm-memo:focus {
+        background: #fff;
+        border-color: var(--primary-400);
+        outline: none;
+        box-shadow: var(--ring);
+    }
+    .crm-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        border-top: 1px dashed var(--border-light);
+        padding-top: 12px;
+    }
+    .btn-script {
+        flex: 1;
+        font-size: 12px;
+        padding: 8px 6px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-light);
+        background: #fff;
+        color: var(--primary-800);
+        cursor: pointer;
+        font-weight: 700;
+        transition: all 0.18s ease;
+        white-space: nowrap;
+    }
+    .btn-script:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-300);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-xs);
+    }
+
+    /* ============================================
+       Toast
+       ============================================ */
+    #toast {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+        color: #fff;
+        padding: 12px 22px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 12px 28px -8px rgba(16, 185, 129, 0.5);
+        display: none;
+        z-index: 2000;
+        animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ============================================
+       Settings Editor
+       ============================================ */
+    .tree-nav {
+        width: 290px;
+        background: var(--slate-50);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        padding: 18px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .tree-nav h3 {
+        font-size: 15px;
+        color: var(--primary-900);
+        margin: 0 0 14px 0;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 12px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+    .tree-list-container {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 14px;
+        padding-right: 4px;
+    }
     .tree-node { margin-bottom: 4px; }
-    .tree-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #475569; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
-    .tree-item:hover { background: #e2e8f0; }
-    .tree-item.active { background: #dbeafe; color: #1e3a8a; font-weight: bold; border: 1px solid #93c5fd;}
-    .tree-item.prov-btn { background: #fef08a; color: #92400e; font-weight: bold; border: 1px solid #fde047; margin-bottom: 15px;}
-    .tree-item.prov-btn.active { background: #eab308; color: white;}
-    .tree-toggle { width: 20px; text-align: center; cursor: pointer; color: #94a3b8; font-size: 12px; margin-right: 5px;}
-    .tree-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-    .tree-delete { color: #ef4444; font-weight: bold; padding: 2px 5px; border-radius: 4px; opacity: 0.3;}
+    .tree-item {
+        padding: 9px 11px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        transition: all 0.15s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 500;
+    }
+    .tree-item:hover { background: var(--slate-200); }
+    .tree-item.active {
+        background: var(--primary-100);
+        color: var(--primary-900);
+        font-weight: 700;
+        box-shadow: inset 0 0 0 1px var(--primary-300);
+    }
+    .tree-item.prov-btn {
+        background: linear-gradient(135deg, #fef9c3, #fef08a);
+        color: #854d0e;
+        font-weight: 700;
+        border: 1px solid #fde047;
+        margin-bottom: 15px;
+    }
+    .tree-item.prov-btn.active {
+        background: linear-gradient(135deg, #eab308, #ca8a04);
+        color: #fff;
+        box-shadow: 0 4px 10px -4px rgba(234, 179, 8, 0.6);
+    }
+    .tree-toggle {
+        width: 20px;
+        text-align: center;
+        cursor: pointer;
+        color: var(--slate-400);
+        font-size: 11px;
+        margin-right: 6px;
+        user-select: none;
+    }
+    .tree-title {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .tree-delete {
+        color: var(--rose-500);
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        opacity: 0.3;
+        transition: all 0.15s ease;
+    }
     .tree-item:hover .tree-delete { opacity: 1; }
-    .tree-delete:hover { background: #fee2e2; }
-    .tree-children { padding-left: 20px; display: block; border-left: 1px dashed #cbd5e1; margin-left: 10px; }
+    .tree-delete:hover { background: var(--rose-50); }
+    .tree-children {
+        padding-left: 18px;
+        border-left: 1px dashed var(--slate-300);
+        margin-left: 10px;
+        display: block;
+    }
     .tree-children.collapsed { display: none; }
-    .editor-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden;}
-    .editor-header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; }
-    .editor-header-bar h2 { margin: 0; color: var(--primary-color); font-size: 20px;}
-    .editor-content { flex: 1; overflow-y: auto; padding-right: 10px;}
-    .node-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
-    .node-title { font-size: 16px; font-weight: bold; color: #1e3a8a; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #475569; }
-    .form-group textarea, .form-group input[type="text"], .form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 15px; box-sizing: border-box; }
-    .form-group textarea { height: 100px; resize: vertical; }
-    .prov-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+    .editor-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .editor-header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 14px;
+        margin-bottom: 16px;
+    }
+    .editor-header-bar h2 {
+        margin: 0;
+        color: var(--primary-900);
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+    .editor-content {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
+    .node-box {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        padding: 22px;
+        box-shadow: var(--shadow-xs);
+    }
+    .node-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--primary-900);
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        letter-spacing: -0.01em;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    .form-group textarea,
+    .form-group input[type="text"],
+    .form-group select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 14.5px;
+        box-sizing: border-box;
+        color: var(--text-primary);
+        background: #fff;
+        transition: all 0.15s ease;
+        line-height: 1.6;
+    }
+    .form-group textarea:focus,
+    .form-group input[type="text"]:focus,
+    .form-group select:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+        outline: none;
+    }
+    .form-group textarea {
+        height: 110px;
+        resize: vertical;
+    }
+
+    .prov-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
     .prov-item { display: flex; flex-direction: column; }
-    .prov-item label { font-size: 13px; color: #1e3a8a; font-weight: bold; margin-bottom: 5px;}
-    .prov-item input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box;}
-    .branch-list { margin-left: 10px; padding-left: 20px; border-left: 2px dashed #cbd5e1; }
-    .branch-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; margin-bottom: 10px; position: relative; display: flex; gap:10px; align-items:center;}
-    .branch-item::before { content: ""; position: absolute; left: -22px; top: 50%; width: 20px; height: 2px; background: #cbd5e1; transform: translateY(-50%);}
-    .branch-item input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
-    .branch-item select { width: 150px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
-    .branch-item .del-branch { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-    .btn-save { background: #22c55e; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%;}
-    .btn-add { background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px;}
-    .region-selector { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
-    .region-selector select { padding: 12px; border-radius: 6px; border: 2px solid var(--secondary-color); font-size: 16px; font-weight: bold; color: var(--primary-color); outline: none; }
-    .tip-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #92400e; margin-bottom: 15px; line-height: 1.6; }
-    .pain-tag-box { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 15px; padding: 10px; background: #f0f9ff; border-radius: 6px; border: 1px dashed #7dd3fc; }
-    .pain-label { font-size: 13px; font-weight: bold; color: #0284c7; }
-    .pain-tag { font-size: 13px; padding: 5px 10px; border-radius: 14px; background: #fff; border: 1px solid #cbd5e1; color: #475569; cursor: pointer; transition: 0.2s; }
-    .pain-tag:hover { border-color: #3b82f6; }
-    .pain-tag.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-    /* 后台管理面板样式 */
-    #adminModal .modal-content { display: block; max-width: 650px; padding: 30px; }
-    .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
-    .admin-header h2 { margin: 0; color: var(--primary-color); font-size: 22px; }
-    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .admin-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: 0.2s; text-align: center; }
-    .admin-card:hover { background: #f0f9ff; border-color: #7dd3fc; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .admin-icon { font-size: 28px; margin-bottom: 10px; }
-    .admin-title { font-size: 15px; font-weight: bold; color: var(--primary-color); margin-bottom: 4px; }
-    .admin-desc { font-size: 12px; color: #64748b; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    /* ============ 移动端适配（手机 < 768px） ============ */
+    .prov-item label {
+        font-size: 12px;
+        color: var(--primary-800);
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .prov-item input {
+        padding: 10px 12px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
+        box-sizing: border-box;
+        transition: all 0.15s ease;
+    }
+    .prov-item input:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+        outline: none;
+    }
+
+    .branch-list {
+        margin-left: 10px;
+        padding-left: 20px;
+        border-left: 2px dashed var(--border-medium);
+    }
+    .branch-item {
+        background: var(--slate-50);
+        border: 1px solid var(--border-light);
+        padding: 12px 14px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 10px;
+        position: relative;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .branch-item::before {
+        content: "";
+        position: absolute;
+        left: -22px;
+        top: 50%;
+        width: 20px;
+        height: 2px;
+        background: var(--border-medium);
+        transform: translateY(-50%);
+    }
+    .branch-item input {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
+        transition: all 0.15s ease;
+    }
+    .branch-item input:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+        outline: none;
+    }
+    .branch-item select {
+        width: 150px;
+        padding: 8px 10px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
+        background: #fff;
+        cursor: pointer;
+    }
+    .branch-item .del-branch {
+        background: var(--rose-500);
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 12px;
+        transition: all 0.15s ease;
+    }
+    .branch-item .del-branch:hover { background: var(--rose-600); }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+        color: #fff;
+        border: none;
+        padding: 13px 24px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 700;
+        width: 100%;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 14px -6px rgba(16, 185, 129, 0.5);
+    }
+    .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px -6px rgba(16, 185, 129, 0.6);
+    }
+    .btn-add {
+        background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        color: #fff;
+        border: none;
+        padding: 10px 16px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-weight: 700;
+        margin-bottom: 14px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px -4px rgba(59, 130, 246, 0.5);
+    }
+    .btn-add:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.6);
+    }
+
+    /* ============================================
+       Admin Panel
+       ============================================ */
+    #adminModal .modal-content {
+        display: block;
+        max-width: 660px;
+        padding: 30px;
+        height: auto;
+        max-height: 88vh;
+        overflow-y: auto;
+    }
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 16px;
+        margin-bottom: 22px;
+    }
+    .admin-header h2 {
+        margin: 0;
+        color: var(--primary-900);
+        font-size: 21px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+    .admin-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 22px 18px;
+        background: var(--slate-50);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+    .admin-card:hover {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border-color: var(--primary-300);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    .admin-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
+        line-height: 1;
+    }
+    .admin-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--primary-900);
+        margin-bottom: 5px;
+        letter-spacing: -0.01em;
+    }
+    .admin-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    /* ============================================
+       Responsive — Tablet
+       ============================================ */
+    @media (max-width: 1024px) {
+        .modal-content { flex-direction: column; }
+        .tree-nav {
+            width: 100%;
+            max-height: 40vh;
+            flex-shrink: 0;
+        }
+        .editor-panel { min-height: 300px; }
+    }
+
+    /* ============================================
+       Responsive — Mobile (< 768px)
+       ============================================ */
     @media (max-width: 768px) {
         body {
+            padding: 12px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+        .top-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .top-bar h1 {
+            font-size: 17px;
+            justify-content: center;
+            text-align: center;
+        }
+        .top-bar h1::before { height: 22px; width: 5px; }
+        .top-input-group {
+            border-radius: 14px;
             padding: 10px;
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .top-bar { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 12px; }
-        .top-bar h1 { font-size: 18px; text-align: center; }
-        .top-input-group { flex-wrap: wrap; padding: 8px 10px; }
-        .top-input-group label { width: 100%; font-size: 13px; }
-        .top-input-group input { flex: 1; min-width: 0; font-size: 16px; padding: 8px 10px; }
-        .top-input-group input#clientCompany { width: auto !important; flex: 1.5; }
-        #clientType { font-size: 14px; padding: 8px 6px; }
-        .top-bar > div:last-child {
-            display: flex; gap: 6px; overflow-x: auto;
-            padding-bottom: 4px; -webkit-overflow-scrolling: touch;
+        .top-input-group label {
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
         }
-        .top-bar > div:last-child::-webkit-scrollbar { display: none; }
-        .btn-settings, .drill-btn { font-size: 12px; padding: 8px 10px; white-space: nowrap; flex-shrink: 0; margin-left: 0; }
+        .top-input-group input {
+            flex: 1;
+            min-width: 0;
+            width: auto !important;
+            font-size: 16px;
+            padding: 9px 12px;
+        }
+        .top-input-group input#clientCompany { flex: 1.5; }
+        #clientType { font-size: 14px; padding: 9px 30px 9px 12px; }
 
-        /* 聊天窗口 */
-        .chat-window { height: 38vh; padding: 12px; gap: 10px; }
-        .message { max-width: 92%; font-size: 14px; padding: 10px 12px; line-height: 1.5; }
+        .top-actions {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .top-actions::-webkit-scrollbar { display: none; }
+        .btn-settings {
+            font-size: 13px;
+            padding: 10px 16px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .main-layout { gap: 14px; }
+        .chat-window {
+            height: 40vh;
+            padding: 14px;
+            gap: 10px;
+            border-radius: 14px;
+        }
+        .welcome-board h2 { font-size: 18px; }
+        .welcome-board p { font-size: 13px; }
+        .message {
+            max-width: 90%;
+            font-size: 14px;
+            padding: 10px 13px;
+            border-radius: 14px;
+        }
         .message:hover::after { display: none; }
 
-        /* 操作面板 */
-        .action-panel { padding: 12px; }
-        .action-title { font-size: 14px; margin-bottom: 10px; padding-bottom: 8px; }
-        .btn-hangup { font-size: 12px; padding: 8px 12px; }
-        .tip-box { font-size: 13px; padding: 8px 10px; margin-bottom: 10px; }
-        .pain-tag-box { padding: 8px; gap: 6px; margin-bottom: 10px; }
+        .action-panel { padding: 16px; border-radius: 14px; }
+        .action-title {
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+        }
+        .btn-hangup { font-size: 12px; padding: 8px 14px; }
+
+        .tip-box { font-size: 13px; padding: 10px 12px; margin-bottom: 10px; }
+        .pain-tag-box { padding: 10px; gap: 6px; margin-bottom: 12px; }
         .pain-label { font-size: 12px; }
-        .pain-tag { font-size: 12px; padding: 5px 8px; }
-        .region-selector { margin-bottom: 10px; flex-direction: column; align-items: stretch; }
+        .pain-tag { font-size: 12px; padding: 6px 12px; }
+
+        .region-selector {
+            margin-bottom: 12px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
         .region-selector label { font-size: 13px; }
-        .region-selector select { width: 100%; font-size: 16px; padding: 10px; }
-        .btn { padding: 14px 12px; font-size: 15px; }
-        .report-card { padding: 15px; }
-        .report-card h3 { font-size: 16px; }
+        .region-selector select { font-size: 16px; padding: 11px 14px; }
+
+        .btn { padding: 14px 14px; font-size: 15px; border-radius: 10px; }
+
+        .report-card { padding: 16px; border-radius: 14px; }
+        .report-card h3 { font-size: 15px; }
         .report-item { font-size: 14px; }
 
-        /* 弹窗全屏 */
+        /* Modals */
         .modal { padding: 0; }
         .modal-content {
-            width: 100%; height: 100%; max-width: none; max-height: none;
-            border-radius: 0; padding: 12px;
-            flex-direction: column; gap: 10px;
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            border-radius: 0;
+            padding: 14px;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        /* 话术配置 */
-        .tree-nav { width: 100%; flex-shrink: 0; max-height: 35vh; padding: 10px; }
-        .tree-nav h3 { font-size: 14px; padding-bottom: 8px; }
-        .tree-list-container { margin-bottom: 8px; }
-        .btn-add, .btn-save { font-size: 13px; padding: 8px 12px; margin-bottom: 8px; }
-        .tree-item { font-size: 13px; padding: 8px; }
+        .tree-nav {
+            width: 100%;
+            max-height: 34vh;
+            padding: 12px;
+        }
+        .tree-nav h3 { font-size: 14px; padding-bottom: 10px; margin-bottom: 10px; }
+        .tree-list-container { margin-bottom: 10px; }
+        .tree-item { font-size: 13px; padding: 9px; }
+
         .editor-panel { flex: 1; min-height: 0; }
-        .editor-header-bar { padding-bottom: 8px; margin-bottom: 10px; }
-        .editor-header-bar h2 { font-size: 16px; }
-        .node-box { padding: 12px; }
-        .node-title { font-size: 14px; margin-bottom: 8px; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { font-size: 13px; margin-bottom: 6px; }
-        .form-group textarea, .form-group input[type="text"], .form-group select {
-            font-size: 16px; padding: 10px;
+        .editor-header-bar { padding-bottom: 10px; margin-bottom: 12px; }
+        .editor-header-bar h2 { font-size: 15px; }
+        .node-box { padding: 14px; border-radius: 12px; }
+        .node-title { font-size: 14px; margin-bottom: 10px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { font-size: 12px; margin-bottom: 6px; }
+        .form-group textarea,
+        .form-group input[type="text"],
+        .form-group select {
+            font-size: 16px;
+            padding: 11px 12px;
         }
-        .form-group textarea { height: 80px; }
-        .branch-item { flex-direction: column; align-items: stretch; padding: 10px; gap: 6px; }
+        .form-group textarea { height: 90px; }
+
+        .branch-item {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 12px;
+            gap: 8px;
+        }
         .branch-item::before { display: none; }
-        .branch-item input, .branch-item select { font-size: 15px; width: 100%; }
-        .branch-item .del-branch { padding: 8px; font-size: 13px; }
+        .branch-item input,
+        .branch-item select { font-size: 15px; width: 100%; }
+        .branch-item .del-branch { padding: 9px; font-size: 13px; }
+
         .prov-grid { grid-template-columns: 1fr; gap: 10px; }
-        .prov-item input { font-size: 15px; padding: 8px; }
+        .prov-item input { font-size: 15px; padding: 9px 12px; }
 
-        /* CRM 弹窗 */
-        #crmModal .crm-list { max-height: none; overflow-y: auto; flex: 1; }
-        .crm-header { font-size: 15px; padding-bottom: 8px; margin-bottom: 10px; }
-        .crm-card { padding: 12px; margin-bottom: 10px; }
-        .crm-name { font-size: 14px; flex-wrap: wrap; }
-        .crm-row { flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 6px; }
+        .btn-add { font-size: 13px; padding: 10px 14px; }
+        .btn-save { font-size: 14px; padding: 12px 20px; }
+
+        /* CRM */
+        #crmModal .modal-content { padding: 14px; }
+        #crmModal .crm-list {
+            max-height: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .crm-header { font-size: 15px; padding-bottom: 10px; margin-bottom: 12px; }
+        .crm-card { padding: 13px; margin-bottom: 10px; }
+        .crm-name { font-size: 14px; }
+        .crm-row { flex-direction: column; align-items: stretch; gap: 5px; margin-bottom: 8px; }
         .crm-row label { width: auto; font-size: 12px; }
-        .crm-row select, .crm-row input { font-size: 15px; padding: 8px; }
-        .crm-tags { gap: 4px; }
-        .tag-btn { font-size: 11px; padding: 4px 6px; }
-        .crm-memo { font-size: 14px; height: 50px; }
+        .crm-row select, .crm-row input { font-size: 15px; padding: 9px 10px; }
+        .crm-tags { gap: 5px; }
+        .tag-btn { font-size: 11.5px; padding: 5px 8px; }
+        .crm-memo { font-size: 14px; height: 52px; }
         .crm-actions { flex-direction: column; }
-        .btn-script { font-size: 13px; padding: 10px; flex: none; width: 100%; }
+        .btn-script {
+            font-size: 13px;
+            padding: 11px;
+            flex: none;
+            width: 100%;
+        }
 
-        #toast { font-size: 13px; padding: 8px 16px; top: 10px; }
+        /* Admin */
+        #adminModal .modal-content { padding: 18px; }
+        .admin-grid { grid-template-columns: 1fr; }
+        .admin-card { padding: 18px 14px; }
+
+        #toast {
+            font-size: 13px;
+            padding: 10px 18px;
+            top: 12px;
+        }
     }
 
-    /* 超小屏（iPhone SE 375px）再压缩一档 */
     @media (max-width: 375px) {
-        .top-bar h1 { font-size: 16px; }
-        .chat-window { height: 35vh; }
+        .top-bar h1 { font-size: 15px; }
+        .chat-window { height: 36vh; }
         .message { font-size: 13px; }
-        .btn { font-size: 14px; padding: 12px 10px; }
+        .btn { font-size: 14px; padding: 12px 12px; }
     }
 </style>
 </head>
@@ -232,9 +1322,9 @@
 <div id="toast">✅ 话术已复制，可直接粘贴发送</div>
 
 <div class="top-bar">
-    <h1>瑞泽净化 - 销售管理与外呼沙盘</h1>
+    <h1>瑞泽净化 · 销售管理与外呼沙盘</h1>
     <div id="clientInfoBox" class="top-input-group">
-        <label>客户信息：</label>
+        <label>客户信息</label>
         <input type="text" id="clientSurname" placeholder="姓氏(如:薛)">
         <input type="text" id="clientCompany" placeholder="公司(如:盈安气体)" style="width: 160px;">
         <select id="clientType" title="客户类型：影响开场白话术">
@@ -242,8 +1332,8 @@
             <option value="工厂">🔧 工厂自用</option>
         </select>
     </div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-    <button class="btn-settings" style="background:#0f172a; padding:10px 20px; font-size:15px; display:flex; align-items:center; gap:6px;" onclick="openAdmin()">⚙️ 系统后台管理</button>
+    <div class="top-actions">
+        <button class="btn-settings" onclick="openAdmin()">⚙️ 系统后台管理</button>
     </div>
 </div>
 
@@ -270,7 +1360,7 @@
                 <span class="pain-tag" data-tag="产能扩建" onclick="togglePainTag(this)">产能扩建</span>
             </div>
             <div id="regionBox" class="region-selector">
-                <label style="font-weight:bold; color:#1e3a8a;">目标省份：</label>
+                <label>目标省份：</label>
                 <select id="provinceSelect"></select>
             </div>
             <div class="btn-group" id="btnGroup">
@@ -278,13 +1368,11 @@
             </div>
         </div>
 
-                <div class="report-card" id="reportCard">
+        <div class="report-card" id="reportCard">
             <h3>📊 客户意向度分析报告</h3>
             <div class="report-item" id="reportLevel"></div>
             <div class="report-item" id="reportReason"></div>
             <div class="report-item" id="reportAction"></div>
-            <!-- 把原来的旧按钮删掉，只保留干净的卡片 -->
-        </div>
         </div>
     </div>
 </div>
@@ -294,20 +1382,21 @@
     <div class="modal-content">
         <div class="crm-header">
             <span>📇 客户跟进中心</span>
-            <div style="display:flex; gap:8px;">
-                <button style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:13px;" onclick="clearCRM()">🗑 清空全部</button>
-                <button style="background:none; border:none; color:#64748b; cursor:pointer; font-size:20px; font-weight:bold;" onclick="closeCRM()">✕</button>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:13px; font-weight:600; padding:4px 8px; border-radius:6px;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'" onclick="clearCRM()">🗑 清空全部</button>
+                <button style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; font-weight:bold; line-height:1; padding:0 4px;" onclick="closeCRM()">✕</button>
             </div>
         </div>
         <div class="crm-list" id="crmList"></div>
     </div>
 </div>
+
 <!-- 后台管理面板 -->
 <div class="modal" id="adminModal">
     <div class="modal-content">
         <div class="admin-header">
             <h2>🛠️ 系统后台管理</h2>
-            <button style="background:none; border:none; color:#64748b; font-size:24px; cursor:pointer;" onclick="document.getElementById('adminModal').style.display='none'">✕</button>
+            <button style="background:none; border:none; color:#64748b; font-size:24px; cursor:pointer; line-height:1; padding:0 4px;" onclick="document.getElementById('adminModal').style.display='none'">✕</button>
         </div>
         <div class="admin-grid">
             <div class="admin-card" onclick="document.getElementById('adminModal').style.display='none'; openCRM();">
@@ -338,6 +1427,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal" id="settingsModal">
     <div class="modal-content">
         <div class="tree-nav">
@@ -346,7 +1436,7 @@
             <div class="tree-item prov-btn" id="nav_prov" onclick="selectProvinceEditor()">🌍 全国各省同行库</div>
             <div class="tree-list-container" id="treeNavList"></div>
             <button class="btn-save" onclick="saveSettings()">💾 保存并生效</button>
-            <button style="background: #94a3b8; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 10px;" onclick="closeSettings()">取消</button>
+            <button style="background:#fff; color:#64748b; border:1px solid #e2e8f0; padding:12px 24px; border-radius:8px; cursor:pointer; font-size:15px; font-weight:700; width:100%; margin-top:10px;" onclick="closeSettings()">取消</button>
         </div>
 
         <div class="editor-panel">
@@ -356,6 +1446,8 @@
     </div>
 </div>
 
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importAll(this)">
+
 <script>
     function getTodayStr() {
         var d = new Date();
@@ -363,8 +1455,13 @@
     }
     function showToast(msg) {
         var toast = document.getElementById('toast');
-        toast.innerText = msg; toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        toast.innerText = msg;
+        toast.style.display = 'block';
+        toast.style.animation = 'none';
+        void toast.offsetHeight;
+        toast.style.animation = '';
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 2000);
     }
     function copyToClipboard(text) {
         var t = document.createElement("textarea"); t.value = text;
@@ -632,7 +1729,7 @@
         localStorage.setItem('ruizeFlowV34', JSON.stringify(flowData));
     }
 
-    // 自动迁移 v36：补齐"争取加微信 + 委婉收尾"软性收尾链，并修复软拒绝分支指向
+    // 自动迁移 v36
     if (!flowData['争取加微信']) {
         flowData['争取加微信'] = {
             text: "好的，理解。那方便加您个微信吗？这样后续有需求，或者设备使用上有任何问题，我也能第一时间为您提供一些技术上的参考建议。",
@@ -683,12 +1780,13 @@
     var isFinished = false;
     var currentClientType = "气站";
     var lastClientObjection = "";
+
     function loadCRM() {
         var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
         var list = document.getElementById('crmList');
         var today = getTodayStr();
         if(crmData.length === 0) {
-            list.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:40px 20px; font-size:14px;">暂无客户档案<br>打通电话后自动生成</div>';
+            list.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:48px 20px; font-size:14px;">暂无客户档案<br><span style="font-size:12px; opacity:0.7;">打通电话后自动生成</span></div>';
             return;
         }
         list.innerHTML = '';
@@ -896,12 +1994,12 @@
             .replace(/\[同行3\]/g, peers[2] || "");
         if (finalText) appendMessage(finalText, "sales");
         renderTip(node.tip);
-        
-        if (node.isEnd) { 
-            finishCall(node.level, node.reason, node.action); 
-            return; 
+
+        if (node.isEnd) {
+            finishCall(node.level, node.reason, node.action);
+            return;
         }
-        
+
         actionTitle.innerText = "客户回复：";
         btnGroup.innerHTML = '';
         if (node.branches) {
@@ -912,24 +2010,21 @@
                 btn.onclick = function() {
                     if(!isCalling || isFinished) return;
                     appendMessage(branch.text, "client");
-                    
+
                     var txt = branch.text;
-                    // 【强力拦截 1】只要带 ✅ 或者写着“结束通话”，强制结算
                     if (txt.includes("✅") || txt.includes("结束通话") || txt.includes("成功加微")) {
-                        var lvl = txt.includes("D类") ? "D" : "C"; // 默认C类，带D类字眼就标记D
+                        var lvl = txt.includes("D类") ? "D" : "C";
                         var rsn = lvl === "D" ? "客户明确拒绝" : "客户暂时无需求，礼貌结束";
                         var act = lvl === "D" ? "不再主动电话" : "定期微信轻触达";
                         finishCall(lvl, rsn, act);
                         return;
                     }
 
-                    // 【强力拦截 2】处理特定的快捷分支
                     if (txt.includes("老板下午在") || txt.includes("不方便给") || txt.includes("我给你老板")) {
                         finishCall("C", "预约外呼 / 拿到线索", "按约定时间回访");
                         return;
                     }
 
-                    // 正常走向下一节点
                     window.loadNode(branch.target);
                 };
                 btnGroup.appendChild(btn);
@@ -951,29 +2046,27 @@
             if (input && /^\d{4}-\d{2}-\d{2}$/.test(input.trim())) customNextDate = input.trim();
         }
 
-        // ▼ 先显示报告卡片（如果不需要看可以直接隐藏，这里保留让你看一眼）
-        document.getElementById('reportCard').style.display = 'block'; 
+        document.getElementById('reportCard').style.display = 'block';
         var reportCard = document.getElementById('reportCard');
         var colorMap = {'A': '#ef4444', 'B': '#f59e0b', 'C': '#3b82f6', 'D': '#64748b'};
         reportCard.style.borderTopColor = colorMap[level] || '#64748b';
-        
+
         document.getElementById('reportLevel').innerHTML = '🎯 客户等级：<strong style="color:' + (colorMap[level]||'#64748b') + '; font-size: 24px;">' + level + ' 类客户</strong>';
         document.getElementById('reportReason').innerHTML = '💡 判定依据：' + reason;
         document.getElementById('reportAction').innerHTML = '📅 跟进建议：<strong>' + action + '</strong>' +
             (customNextDate ? '<br>⏰ 已设置回电提醒：<strong style="color:#ef4444;">' + customNextDate + '</strong>' : '');
-        
+
         saveToCRM(level, reason, customNextDate);
 
-        // ▼ 把操作面板恢复，并放上大绿按钮
-        document.getElementById('actionPanel').style.display = 'block'; 
+        document.getElementById('actionPanel').style.display = 'block';
         actionTitle.innerText = "✅ 客户已归档入库";
-        
+
         btnGroup.innerHTML = `
-            <button class="btn" style="text-align:center; background:#22c55e; color:white; border:none; font-size:18px; padding:18px; font-weight:bold; border-radius:8px; box-shadow: 0 4px 10px rgba(34,197,94,0.3); width:100%; cursor:pointer; margin-top:10px;" onclick="resetCall()">
+            <button class="btn" style="text-align:center; background:linear-gradient(135deg,#22c55e,#16a34a); color:white; border:none; font-size:17px; padding:18px; font-weight:800; border-radius:12px; box-shadow: 0 8px 20px -8px rgba(34,197,94,0.6); width:100%; cursor:pointer; margin-top:10px; letter-spacing:0.02em;" onclick="resetCall()">
                 🔄 开始下一通电话
             </button>
         `;
-        
+
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
@@ -1056,7 +2149,7 @@
                 <div class="form-group"><label>客户评级 (A/B/C/D)：</label><input type="text" id="edit_level" value="${node.level}"></div>
                 <div class="form-group"><label>判定依据：</label><input type="text" id="edit_reason" value="${node.reason}"></div>
                 <div class="form-group"><label>跟进建议：</label><input type="text" id="edit_action" value="${node.action}"></div>
-                <button class="btn-submit" onclick="saveEndNode('${nodeId}')">保存结局配置</button></div>`;
+                <button class="btn-add" style="width:100%; padding:12px;" onclick="saveEndNode('${nodeId}')">保存结局配置</button></div>`;
         } else {
             var branchesHtml = '';
             if (node.branches) {
@@ -1065,13 +2158,13 @@
                     branchesHtml += `<div class="branch-item"><input type="text" value="${branch.text}" onchange="flowData['${nodeId}'].branches[${i}].text = this.value"><select onchange="flowData['${nodeId}'].branches[${i}].target = this.value">${options}</select><button class="del-branch" onclick="deleteBranch('${nodeId}', ${i})">删</button></div>`;
                 });
             }
-            var factoryHtml = `<div class="form-group"><label>🔧 工厂版话术（可选，填写后客户类型选"工厂"时自动替换上面的话术）</label><textarea id="edit_text_factory" style="height:70px; background:#eff6ff; border-color:#93c5fd;" onchange="flowData['${nodeId}'].textFactory = this.value" placeholder="留空则工厂客户也使用上方默认话术...">${node.textFactory || ''}</textarea></div>`;
+            var factoryHtml = `<div class="form-group"><label>🔧 工厂版话术（可选，填写后客户类型选"工厂"时自动替换上面的话术）</label><textarea id="edit_text_factory" style="height:80px; background:#eff6ff; border-color:#93c5fd;" onchange="flowData['${nodeId}'].textFactory = this.value" placeholder="留空则工厂客户也使用上方默认话术...">${node.textFactory || ''}</textarea></div>`;
             container.innerHTML = `<div class="node-box"><div class="node-title"><span>销售话术</span></div>
                 <div class="form-group"><label>对外话术（发给客户）</label><textarea id="edit_text" onchange="flowData['${nodeId}'].text = this.value">${node.text}</textarea></div>
-                <div class="form-group"><label>💡 销售提示（仅销售可见，不发给客户）</label><textarea id="edit_tip" style="height:70px; background:#fef3c7; border-color:#f59e0b;" onchange="flowData['${nodeId}'].tip = this.value" placeholder="填写谈判注意事项...">${node.tip || ''}</textarea></div>
+                <div class="form-group"><label>💡 销售提示（仅销售可见，不发给客户）</label><textarea id="edit_tip" style="height:80px; background:#fffbeb; border-color:#f59e0b;" onchange="flowData['${nodeId}'].tip = this.value" placeholder="填写谈判注意事项...">${node.tip || ''}</textarea></div>
                 ${factoryHtml}
-                <div class="node-title"><span>客户反应分支</span><button class="btn-add" style="margin:0; padding:5px 10px; font-size:12px;" onclick="addBranch('${nodeId}')">➕ 增加一条反应</button></div>
-                <div class="branch-list">${branchesHtml || '<p>暂无</p>'}</div></div>`;
+                <div class="node-title"><span>客户反应分支</span><button class="btn-add" style="margin:0; padding:6px 12px; font-size:12px;" onclick="addBranch('${nodeId}')">➕ 增加一条反应</button></div>
+                <div class="branch-list">${branchesHtml || '<p style="color:#94a3b8; font-size:13px;">暂无</p>'}</div></div>`;
         }
     }
 
@@ -1097,10 +2190,11 @@
     function saveEndNode(nodeId) { flowData[nodeId].level = document.getElementById('edit_level').value; flowData[nodeId].reason = document.getElementById('edit_reason').value; flowData[nodeId].action = document.getElementById('edit_action').value; alert("请点保存并生效"); }
 
     function selectProvinceEditor() {
-        document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active')); document.getElementById('nav_prov').classList.add('active');
+        document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav_prov').classList.add('active');
         document.getElementById('editorHeader').innerText = "🌍 全国34省同行库管理";
         var container = document.getElementById('editorContainer'); container.innerHTML = '';
-        var provHtml = `<div class="node-box"><div class="node-title">各省同行库 (无本省数据的省份自动调用邻省数据，请用顿号隔开)</div><div class="prov-grid">`;
+        var provHtml = `<div class="node-box"><div class="node-title">各省同行库 <span style="font-size:12px; font-weight:500; color:#94a3b8;">无本省数据自动调用邻省 / 顿号隔开</span></div><div class="prov-grid">`;
         allProvinces.forEach(function(prov) {
             var effective = getPeers(prov);
             var hint = (realData[prov] && realData[prov].trim() !== '') ? '' : (effective ? '（调邻省）' : '（无数据）');
